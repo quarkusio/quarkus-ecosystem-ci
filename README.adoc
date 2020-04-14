@@ -161,7 +161,7 @@ jobs:
 
 Finally, if your extension requires a custom test script (by default `default-test` is used), add a file named `.github/test`.
 
-An example project containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/3dc093456dd46eb66b04e593860b0918ca0cad0a/.github/workflows/quarkus-master.yml[here].
+An example project containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/5f4fcac2a940451fcc5ef4f9940b24a8067da7a5/.github/workflows/quarkus-master.yml[here].
 
 == How come this works?
 
