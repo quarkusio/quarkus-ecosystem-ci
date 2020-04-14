@@ -44,10 +44,10 @@ An example of the above configuration can be found https://github.com/quarkusio/
 3. Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
 in order to open and close the issue from the CI action.
 
-4. Add the following files to configure the Quarkus CI in Github Actions for your repository:
-
+4. Add the following file to configure the Quarkus CI in Github Actions for your repository:
++
 `.github/workflows/quarkus-master.yaml` (this file contains the actual Github Actions declaration)
-
++
 [source,yaml]
 ----
 name: "Quarkus ecosystem CI"
