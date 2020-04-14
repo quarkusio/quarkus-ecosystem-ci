@@ -33,8 +33,8 @@ class Report implements Runnable {
 	@Option(names = "thisRepo", description = "The repository for which we are reporting the CI status")
 	private String thisRepo;
 
-	@Option(names = "actionId", description = "The ID of the Github Action run for  which we are reporting the CI status")
-	private String actionId;
+	@Option(names = "runId", description = "The ID of the Github Action run for  which we are reporting the CI status")
+	private String runId;
 
 	@Override
 	public void run() {
@@ -62,7 +62,7 @@ class Report implements Runnable {
 			if (succeed) {
 				if (issue != null  && isOpen(issue)) {
 					// close issue with a comment
-					final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, actionId));
+					final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
 					issue.close();
 					System.out.println(String.format("Comment added on issue %s - %s, the issue has also been closed", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 				} else {
@@ -70,11 +70,11 @@ class Report implements Runnable {
 				}
 			} else  {
 				if (isOpen(issue)) {
-					final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, actionId));
+					final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
 					System.out.println(String.format("Comment added on issue %s - %s", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 				} else {
 					issue.reopen();
-					final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, actionId));
+					final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
 					System.out.println(String.format("Comment added on issue %s - %s, the issue has been re-opened", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 				}
 			}
