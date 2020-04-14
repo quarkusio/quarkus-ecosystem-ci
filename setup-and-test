@@ -52,7 +52,7 @@ curl -s "https://get.sdkman.io" | bash
 source ~/.sdkman/bin/sdkman-init.sh
 sdk install jbang 0.21.0
 
-jbang .github/report.java "${ECOSYSTEM_CI_TOKEN}" "${TEST_STATUS}" "${ISSUE_REPO}" "${ISSUE_NUM}" "${GITHUB_REPOSITORY}"
+jbang .github/report.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}"
 
 echo "Report completed"
 

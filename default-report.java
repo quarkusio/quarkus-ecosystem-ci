@@ -1,64 +1,94 @@
 //usr/bin/env jbang "$0" "$@" ; exit $?
 
 //DEPS org.kohsuke:github-api:1.101
+//DEPS info.picocli:picocli:4.2.0
 
 import org.kohsuke.github.*;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.concurrent.TimeUnit;
 
-class Report {
+@Command(name = "report", mixinStandardHelpOptions = true,
+		description = "Takes care of updating the an issue depending on the status of the build")
+class Report implements Runnable {
 
-	public static void main(String[] args) throws IOException {
-		final String token = args[0];
-		final String status = args[1];
-		final String issueRepo = args[2];
-		final Integer issueNumber = Integer.valueOf(args[3]);
-		final String thisRepo = args[4];
+	@Option(names = "token", description = "Github token to use when calling the Github API")
+	private String token;
 
-		final boolean succeed = "success".equalsIgnoreCase(status);
-		if ("cancelled".equalsIgnoreCase(status)) {
-			System.out.println("Job status is `cancelled` - exiting");
-			System.exit(0);
-		}
+	@Option(names = "status", description = "The status of the CI run")
+	private String status;
 
-		System.out.println(String.format("The CI build had status %s.", status));
+	@Option(names = "issueRepo", description = "The repository where the issue resides (i.e. quarkusio/quarkus)")
+	private String issueRepo;
 
-		final GitHub github = new GitHubBuilder().withOAuthToken(token).build();
-		final GHRepository repository = github.getRepository(issueRepo);
+	@Option(names = "issueNumber", description = "The issue to update")
+	private Integer issueNumber;
 
-		final GHIssue issue = repository.getIssue(issueNumber);
-		if (issue == null) {
-			System.out.println(String.format("Unable to find the issue %s in project %s", issueNumber, issueRepo));
-			System.exit(-1);
-		} else {
-			System.out.println(String.format("Report issue found: %s - %s", issue.getTitle(), issue.getHtmlUrl().toString()));
-			System.out.println(String.format("The issue is currently %s", issue.getState().toString()));
-		}
+	@Option(names = "thisRepo", description = "The repository for which we are reporting the CI status")
+	private String thisRepo;
 
-		if (succeed) {
-			if (issue != null  && isOpen(issue)) {
-				// close issue with a comment
-				final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions", thisRepo));
-				issue.close();
-				System.out.println(String.format("Comment added on issue %s - %s, the issue has also been closed", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
-			} else {
-				System.out.println("Nothing to do - the build passed and the issue is already closed");
+	@Override
+	public void run() {
+		try {
+			final boolean succeed = "success".equalsIgnoreCase(status);
+			if ("cancelled".equalsIgnoreCase(status)) {
+				System.out.println("Job status is `cancelled` - exiting");
+				System.exit(0);
 			}
-		} else  {
-			if (isOpen(issue)) {
-				final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions", thisRepo));
-				System.out.println(String.format("Comment added on issue %s - %s", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+
+			System.out.println(String.format("The CI build had status %s.", status));
+
+			final GitHub github = new GitHubBuilder().withOAuthToken(token).build();
+			final GHRepository repository = github.getRepository(issueRepo);
+
+			final GHIssue issue = repository.getIssue(issueNumber);
+			if (issue == null) {
+				System.out.println(String.format("Unable to find the issue %s in project %s", issueNumber, issueRepo));
+				System.exit(-1);
 			} else {
-				issue.reopen();
-				final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions", thisRepo));
-				System.out.println(String.format("Comment added on issue %s - %s, the issue has been re-opened", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+				System.out.println(String.format("Report issue found: %s - %s", issue.getTitle(), issue.getHtmlUrl().toString()));
+				System.out.println(String.format("The issue is currently %s", issue.getState().toString()));
+			}
+
+			if (succeed) {
+				if (issue != null  && isOpen(issue)) {
+					// close issue with a comment
+					final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions", thisRepo));
+					issue.close();
+					System.out.println(String.format("Comment added on issue %s - %s, the issue has also been closed", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+				} else {
+					System.out.println("Nothing to do - the build passed and the issue is already closed");
+				}
+			} else  {
+				if (isOpen(issue)) {
+					final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions", thisRepo));
+					System.out.println(String.format("Comment added on issue %s - %s", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+				} else {
+					issue.reopen();
+					final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions", thisRepo));
+					System.out.println(String.format("Comment added on issue %s - %s, the issue has been re-opened", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+				}
 			}
 		}
-
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	private static boolean isOpen(GHIssue issue) {
 		return (issue.getState() == GHIssueState.OPEN);
+	}
+
+	// this example implements Callable, so parsing, error handling and handling user
+	// requests for usage help or version help can be done with one line of code.
+	public static void main(String... args) {
+		int exitCode = new CommandLine(new Report()).execute(args);
+		System.exit(exitCode);
 	}
 }
