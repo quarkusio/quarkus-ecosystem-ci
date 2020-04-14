@@ -98,7 +98,7 @@ jobs:
           path: ecosystem-ci
 
       - name: Setup and Run Tests
-        run: ./setup-and-test
+        run: ./ecosystem-ci/setup-and-test
 ----
 
 Finally, if your extension requires a custom test script (by default `default-test` is used), add a file named `.github/test`.
