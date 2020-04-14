@@ -1,6 +1,6 @@
-timestamp: 2020-04-14_10-24-34
+timestamp: 2020-04-14_10-35-32
 issues:
-  latestCommit: 8561
+  latestCommit: 8562
   repo: quarkusio/quarkus
 quarkus:
   version: 999-SNAPSHOT
