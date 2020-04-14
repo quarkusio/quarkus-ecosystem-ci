@@ -31,12 +31,13 @@ The user can be a regular user (for example the author of the extension) or a bo
 +
 The needs to contain the following information:
 +
-```yaml
-url: https://github.com/someorg/my-extension # Github repo of your extension 
+[source,yaml]
+----
+url: https://github.com/someorg/my-extension # Github repo of your extension
 issues:
   repo: quarkusio/quarkus # this should be left as is when CI updates are going to be reported on the Quarkus repository
-  latestCommit: 123456 # this is the number of the issue you created above 
-```     
+  latestCommit: 123456 # this is the number of the issue you created above
+----
 +
 An example of the above configuration can be found [here](https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml).
 
@@ -47,7 +48,8 @@ in order to open and close the issue from the CI action.
 
 `.github/workflows/quarkus-master.yaml` (this file contains the actual Github Actions declaration)
 
-```yaml
+[source,yaml]
+----
 name: "Quarkus ecosystem CI"
 on:
   watch:
@@ -65,7 +67,7 @@ env:
   # Repo specific setting #
   #########################
 
-  ECOSYSTEM_CI_REPO_PATH: FIXME # TODO: this needs to be set to the directory name added in 'quarkusio/quarkus-ecosystem-ci' 
+  ECOSYSTEM_CI_REPO_PATH: FIXME # TODO: this needs to be set to the directory name added in 'quarkusio/quarkus-ecosystem-ci'
 
 jobs:
   build:
@@ -155,7 +157,7 @@ jobs:
           if [[ ${TEST_STATUS} != "success" ]]; then
             exit 1
           fi
-```
+----
 
 Finally, if your extension requires a custom test script (by default `default-test` is used), add a file named `.github/test`.
 
