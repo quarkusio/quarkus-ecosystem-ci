@@ -172,7 +172,7 @@ jobs:
 </settings>
 ```
 
-`.github/report.java` (a [jbang](https://github.com/maxandersen/jbang) script that updates the issue status mentioned in step 1)
+`.github/report.java` (a https://github.com/maxandersen/jbang[jbang]) script that updates the issue status mentioned in step 1)
 
 ```java
 //usr/bin/env jbang "$0" "$@" ; exit $?
