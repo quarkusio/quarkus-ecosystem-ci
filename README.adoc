@@ -22,7 +22,7 @@ image::{plantuml}/ci-overview.puml[CI Overview]
 After your extension has been added to the Quarkus Platform, you will additionally need to do the following:
 
 1. Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome). 
-An example of such an issue is can be found [here](https://github.com/quarkusio/quarkus/issues/8562). 
+An example of such an issue is can be found https://github.com/quarkusio/quarkus/issues/8562[here]. 
 +
 Note that in one of the following steps you will need to configure a Github token for **this** user in **your** extension repository. 
 The user can be a regular user (for example the author of the extension) or a bot.   
