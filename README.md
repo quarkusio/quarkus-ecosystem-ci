@@ -247,3 +247,9 @@ mvn --settings .github/mvn-settings.xml clean install -Dquarkus.version=${QUARKU
 ```
 
 An example project containing all these files (and which has been tested with the whole process) can be found [here](https://github.com/geoand/quarkus-qpid-jms/tree/dc4933338a4f1b8588e6d069575a7769a5b22608/.github)
+
+## How come this works?
+
+The "trick" (more like a hack actually) is that Quarkus Platform participant's Github Actions are triggered when the Quarkus Ecosystem CI stars the extension repository.
+Furthermore, before starring the repository, some context information is written to this repository which is then meant to be read in the triggered Github Action.
+This way this Quarkus Github Action does not need to hold any secrets for the participants.  
