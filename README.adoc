@@ -46,7 +46,7 @@ in order to open and close the issue from the CI action.
 
 4. Add the following file to configure the Quarkus CI in Github Actions for your repository:
 +
-`.github/workflows/quarkus-master.yaml` (this file contains the actual Github Actions declaration)
+`.github/workflows/quarkus-snapshot.yaml` (this file contains the actual Github Actions declaration)
 +
 [source,yaml]
 ----
@@ -71,7 +71,7 @@ env:
 
 jobs:
   build:
-    name: "Build against Quarkus from master"
+    name: "Build against latest Quarkus snapshot"
     runs-on: ubuntu-latest
     if: github.actor == 'quarkusbot'
 
@@ -161,7 +161,7 @@ jobs:
 
 Finally, if your extension requires a custom test script (by default `default-test` is used), add a file named `.github/test`.
 
-An example project containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/5f4fcac2a940451fcc5ef4f9940b24a8067da7a5/.github/workflows/quarkus-master.yml[here].
+An example project containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/7681349f8bd77a626ab8d38c4d1d3129b7916d08/.github/workflows/quarkus-snapshots.yml[here].
 
 == How come this works?
 
