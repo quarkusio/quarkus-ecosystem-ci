@@ -11,31 +11,31 @@ cd - > /dev/null
 cd current-repo
 
 # check the test script
-if [ -f .github/test ]; then
+if [ -f .github/quarkus-ecosystem-test ]; then
     echo "Test script found"
 else
     echo "Test script not found - using default from quarkus-ecosystem-ci"
-    cp ../ecosystem-ci/default-test .github/test
+    cp ../ecosystem-ci/quarkus-ecosystem-test .github/quarkus-ecosystem-test
 fi
 
 # check the report script
-if [ -f .github/report.java ]; then
+if [ -f .github/quarkus-ecosystem-issue.java ]; then
     echo "Report script found"
 else
     echo "Report script not found - using default from quarkus-ecosystem-ci"
-    cp ../ecosystem-ci/default-report.java .github/report.java
+    cp ../ecosystem-ci/quarkus-ecosystem-issue.java .github/quarkus-ecosystem-issue.java
 fi
 
 # check the Maven settings file
-if [ -f .github/mvn-settings.xml ]; then
+if [ -f .github/quarkus-ecosystem-maven-settings.xml ]; then
     echo "Maven settings file found"
 else
     echo "Maven settings file not found - using default from quarkus-ecosystem-ci"
-    cp ../ecosystem-ci/default-maven-settings.xml .github/mvn-settings.xml
+    cp ../ecosystem-ci/quarkus-ecosystem-maven-settings.xml .github/quarkus-ecosystem-maven-settings.xml
 fi
 
-if QUARKUS_VERSION=${QUARKUS_VERSION} .github/test ; then
-  echo "Tests succeded"
+if QUARKUS_VERSION=${QUARKUS_VERSION} .github/quarkus-ecosystem-test ; then
+  echo "Tests succeeded"
   TEST_STATUS="success"
 else
   echo "Tests failed"
@@ -52,7 +52,7 @@ curl -s "https://get.sdkman.io" | bash
 source ~/.sdkman/bin/sdkman-init.sh
 sdk install jbang 0.21.0
 
-jbang .github/report.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}"
+jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}"
 
 echo "Report completed"
 
