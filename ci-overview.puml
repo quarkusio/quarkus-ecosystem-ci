@@ -1,0 +1,19 @@
+@startuml
+
+quarkus -> quarkusbot : lastest quarkus build  
+quarkusbot -> extension : star repo
+extension -> "ecosystem-ci" : fetch latest build info
+extension -> extension : trigger build using build info
+extension -> quarkus : close/open issue
+
+box "github.com/quarkusio" #LightBlue
+participant quarkus
+participant quarkusbot
+participant "ecosystem-ci"
+end box
+
+box "github.com/quarkusio" #LavenderBlush
+participant extension
+end box
+
+@enduml

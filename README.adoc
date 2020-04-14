@@ -1,44 +1,49 @@
-# quarkus-ecosystem-ci
+= quarkus-ecosystem-ci
+:plantuml: http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/quarkusio/ecosystem-ci/master/
+
 Repository used for orchestrating cross-CI builds of extensions part of Quarkus ecosystem/universe.
 
-# What it's all about
+== What it's all about
 
-It's in everyone's interest to know if participants in the [Quarkus Platform](https://github.com/quarkusio/quarkus-platform) build properly 
+It's in everyone's interest to know if Quarkus extensions and especially participants in the [Quarkus Platform](https://github.com/quarkusio/quarkus-platform) build properly 
 against the latest Quarkus, since Quarkus moves very fast.
-At the same time, due to resource constraints it is not possible for all platform members to run their tests in the Quarkus organization.
+At the same time, due to resource constraints it is not possible for every extension to run their tests in the Quarkus organization.
 In that vein Quarkus has come up with a solution that allows both Quarkus members and Quarkus Platform participants to know each day whether their extension
 works with the latest Quarkus or not, while sharing the CI load amongst platform participants.
 Furthermore, the solution aims to be as frictionless as possible for Quarkus Platform participants while also not requiring said participants to trust 
-Quarkus with their github tokens. 
+Quarkus with their GitHub tokens. 
 
 This repository contains the metadata that needs to be setup for a platform participant to have their CI automatically triggered and post the result on a Quarkus issue.
 
-# What do I need to do as a Quarkus Platform participant  
+image::{plantuml}/ci-overview.puml[CI Overview]
+
+== What do I need to do as a Quarkus Platform participant  
 
 After your extension has been added to the Quarkus Platform, you will additionally need to do the following:
 
-* Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome). 
+1. Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome). 
 An example of such an issue is can be found [here](https://github.com/quarkusio/quarkus/issues/8562). 
-
++
 Note that in one of the following steps you will need to configure a Github token for **this** user in **your** extension repository. 
 The user can be a regular user (for example the author of the extension) or a bot.   
 
-* Open a Pull Request to this repository where you add a directory for your extension and inside it place a file named `info.yaml`.
+2. Open a Pull Request to this https://github.com/ecosystem-ci[ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
++
 The needs to contain the following information:
-
++
 ```yaml
 url: https://github.com/someorg/my-extension # Github repo of your extension 
 issues:
   repo: quarkusio/quarkus # this should be left as is when CI updates are going to be reported on the Quarkus repository
   latestCommit: 123456 # this is the number of the issue you created above 
 ```     
-
++
 An example of the above configuration can be found [here](https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml).
 
-* Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
+3. Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
 in order to open and close the issue from the CI action.
 
-* Add the following files to configure the Quarkus CI in Github Actions for your repository:
+4. Add the following files to configure the Quarkus CI in Github Actions for your repository:
 
 `.github/workflows/quarkus-master.yaml` (this file contains the actual Github Actions declaration)
 
@@ -246,7 +251,7 @@ set -e
 mvn --settings .github/mvn-settings.xml clean install -Dquarkus.version=${QUARKUS_VERSION} -Dnative -Dquarkus.native.container-build=true
 ```
 
-An example project containing all these files (and which has been tested with the whole process) can be found [here](https://github.com/geoand/quarkus-qpid-jms/tree/dc4933338a4f1b8588e6d069575a7769a5b22608/.github)
+An example project containing all these files (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/tree/dc4933338a4f1b8588e6d069575a7769a5b22608/.github[here].
 
 ## How come this works?
 
