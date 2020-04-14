@@ -39,7 +39,7 @@ issues:
   latestCommit: 123456 # this is the number of the issue you created above
 ----
 +
-An example of the above configuration can be found [here](https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml).
+An example of the above configuration can be found https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml[here].
 
 3. Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
 in order to open and close the issue from the CI action.
