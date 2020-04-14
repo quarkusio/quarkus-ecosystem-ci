@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -e
+
+# This assumes that the $PWD is ecosystem-ci
+
+ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.latestCommit)
+ISSUE_REPO=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.repo)
+QUARKUS_VERSION=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.version)
+
+
+# perform actual test run
+cd ../current-repo
+
+# check the test script
+if [ -f .github/test ]; then
+    echo "Test script found"
+else
+    echo "Test script not found - using default from quarkus-ecosystem-ci"
+    cp ../ecosystem-ci/default-test .github/test
+fi
+
+# check the report script
+if [ -f .github/report.java ]; then
+    echo "Report script found"
+else
+    echo "Report script not found - using default from quarkus-ecosystem-ci"
+    cp ../ecosystem-ci/default-report.java .github/report.java
+fi
+
+# check the Maven settings file
+if [ -f .github/mvn-settings.xml ]; then
+    echo "Maven settings file found"
+else
+    echo "Maven settings file not found - using default from quarkus-ecosystem-ci"
+    cp ../ecosystem-ci/default-maven-settings.xml .github/mvn-settings.xml
+fi
+
+if QUARKUS_VERSION=${QUARKUS_VERSION} .github/test ; then
+  echo "Tests succeded"
+  TEST_STATUS="success"
+else
+  echo "Tests failed"
+  TEST_STATUS="failure"
+fi
+
+echo "Attempting to report results"
+
+sudo apt-get update -o Dir::Etc::sourcelist="sources.list" \
+  -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+sudo apt-get install -y gnupg2 gnupg-agent
+echo "Installing SDKMAN"
+curl -s "https://get.sdkman.io" | bash
+source ~/.sdkman/bin/sdkman-init.sh
+sdk install jbang 0.21.0
+
+jbang .github/report.java "${{ secrets.ECOSYSTEM_CI_TOKEN }}" "${TEST_STATUS}" "${ISSUE_REPO}" "${ISSUE_NUM}" "${GITHUB_REPOSITORY}"
+
+echo "Report completed"
+
+if [[ ${TEST_STATUS} != "success" ]]; then
+  exit 1
+fi
