@@ -1,7 +1,10 @@
 name: "Quarkus Ecosystem CI Trigger"
 
 # Adding the dispatch event to allow restarting the build on demand
-on: [push]
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  repository_dispatch:
 
 jobs:
   invoke-ci:
