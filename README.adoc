@@ -5,27 +5,27 @@ Repository used for orchestrating cross-CI builds of extensions part of Quarkus 
 
 == What it's all about
 
-It's in everyone's interest to know if Quarkus extensions and especially participants in the [Quarkus Platform](https://github.com/quarkusio/quarkus-platform) build properly 
+It's in everyone's interest to know if Quarkus extensions and especially participants in the https://github.com/quarkusio/quarkus-platform[Quarkus Platform] build properly
 against the latest Quarkus, since Quarkus moves very fast.
 At the same time, due to resource constraints it is not possible for every extension to run their tests in the Quarkus organization.
 In that vein Quarkus has come up with a solution that allows both Quarkus members and Quarkus Platform participants to know each day whether their extension
 works with the latest Quarkus or not, while sharing the CI load amongst platform participants.
-Furthermore, the solution aims to be as frictionless as possible for Quarkus Platform participants while also not requiring said participants to trust 
-Quarkus with their GitHub tokens. 
+Furthermore, the solution aims to be as frictionless as possible for Quarkus Platform participants while also not requiring said participants to trust
+Quarkus with their GitHub tokens.
 
 This repository contains the metadata that needs to be setup for a platform participant to have their CI automatically triggered and post the result on a Quarkus issue.
 
 image::{plantuml}/ci-overview.puml[CI Overview]
 
-== What do I need to do as a Quarkus Platform participant  
+== What do I need to do as a Quarkus Platform participant
 
 After your extension has been added to the Quarkus Platform, you will additionally need to do the following:
 
-1. Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome). 
+1. Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome).
 An example of such an issue is can be found https://github.com/quarkusio/quarkus/issues/8593[here].
 +
-Note that in one of the following steps you will need to configure a Github token for **this** user in **your** extension repository. 
-The user can be a regular user (for example the author of the extension) or a bot.   
+Note that in one of the following steps you will need to configure a Github token for **this** user in **your** extension repository.
+The user can be a regular user (for example the author of the extension) or a bot.
 
 2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
 +
@@ -111,4 +111,4 @@ Example projects containing the proper Github Action YAML file (and which has be
 
 The "trick" (more like a hack actually) is that Quarkus Platform participant's Github Actions are triggered when the Quarkus Ecosystem CI stars the extension repository.
 Furthermore, before starring the repository, some context information is written to this repository which is then meant to be read in the triggered Github Action.
-This way this Quarkus Github Action does not need to hold any secrets for the participants.  
+This way this Quarkus Github Action does not need to hold any secrets for the participants.
