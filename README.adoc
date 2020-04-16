@@ -22,12 +22,12 @@ image::{plantuml}/ci-overview.puml[CI Overview]
 After your extension has been added to the Quarkus Platform, you will additionally need to do the following:
 
 1. Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome). 
-An example of such an issue is can be found https://github.com/quarkusio/quarkus/issues/8562[here]. 
+An example of such an issue is can be found https://github.com/quarkusio/quarkus/issues/8593[here].
 +
 Note that in one of the following steps you will need to configure a Github token for **this** user in **your** extension repository. 
 The user can be a regular user (for example the author of the extension) or a bot.   
 
-2. Open a Pull Request to this https://github.com/ecosystem-ci[ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
+2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
 +
 The needs to contain the following information:
 +
@@ -105,7 +105,7 @@ jobs:
 
 Finally, if your extension requires a custom test script (by default `quarkus-ecosystem-test` from this repository is used), add a file named `.github/quarkus-ecosystem-test`.
 
-An example project containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github/workflows/quarkus-snapshots.yml[here].
+Example projects containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/master/.github[here].
 
 == How come this works?
 
