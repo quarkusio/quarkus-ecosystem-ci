@@ -107,6 +107,17 @@ Finally, if your extension requires a custom test script (by default `quarkus-ec
 
 Example projects containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/master/.github[here].
 
+=== How to create a token for use with Ecosystem CI
+
+In case you haven't created a Github token before, the process is roughly as follows:
+
+You can generate a token by accessing https://github.com/settings/tokens and clicking on `Generate new token`. On the page that comes up,
+provide a name,  select `repo` scope and click on `Generate token` at the bottom of the page. You will be prompted with the newly generated token, but be sure to copy it wherever
+it is needed, because you won't be able to see it again.
+
+Now that you have created the token, you need to create Github Secret with its value, by first accessing `/settings/secrets` in your repository, then adding a new secret named `ECOSYSTEM_CI_TOKEN`
+where you simply paste the contents of the token and save by clicking on `Add token`.
+
 == How come this works?
 
 The "trick" (more like a hack actually) is that Quarkus Platform participant's Github Actions are triggered when the Quarkus Ecosystem CI stars the extension repository.
