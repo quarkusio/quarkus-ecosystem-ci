@@ -1,6 +1,6 @@
 @startuml
 
-quarkus -> quarkusbot : lastest quarkus build  
+quarkus -> quarkusbot : latest quarkus build  
 quarkusbot -> extension : star repo
 extension -> "ecosystem-ci" : fetch latest build info
 extension -> extension : trigger build using build info
