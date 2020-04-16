@@ -1,6 +1,0 @@
-timestamp: 2020-04-16_05-02-53
-issues:
-  latestCommit: 8562
-  repo: quarkusio/quarkus
-quarkus:
-  version: 999-SNAPSHOT
