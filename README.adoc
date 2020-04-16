@@ -8,12 +8,12 @@ Repository used for orchestrating cross-CI builds of extensions part of Quarkus 
 It's in everyone's interest to know if Quarkus extensions and especially participants in the https://github.com/quarkusio/quarkus-platform[Quarkus Platform] build properly
 against the latest Quarkus, since Quarkus moves very fast.
 At the same time, due to resource constraints it is not possible for every extension to run their tests in the Quarkus organization.
-In that vein Quarkus has come up with a solution that allows both Quarkus members and Quarkus Platform participants to know each day whether their extension
+In that vein Quarkus has come up with a solution that allows both Quarkus contributors and Quarkus Platform participants to know each day whether their extension
 works with the latest Quarkus or not, while sharing the CI load amongst platform participants.
 Furthermore, the solution aims to be as frictionless as possible for Quarkus Platform participants while also not requiring said participants to trust
 Quarkus with their GitHub tokens.
 
-This repository contains the metadata that needs to be setup for a platform participant to have their CI automatically triggered and post the result on a Quarkus issue.
+This repository contains the metadata that needs to be set up for a platform participant to have their CI automatically triggered and post the result on a Quarkus issue.
 
 image::{plantuml}/ci-overview.puml[CI Overview]
 
@@ -21,10 +21,10 @@ image::{plantuml}/ci-overview.puml[CI Overview]
 
 After your extension has been added to the Quarkus Platform, you will additionally need to do the following:
 
-1. Open an issue on the Quarkus repo, where updates will be posted (the CI job will close or open the issue depending on the CI outcome).
-An example of such an issue is can be found https://github.com/quarkusio/quarkus/issues/8593[here].
+1. Open an issue in https://github.com/quarkusio/quarkus/issues[the Quarkus issue tracker], where updates will be posted (the CI job will close or open the issue depending on the CI outcome).
+An example of such an issue can be found https://github.com/quarkusio/quarkus/issues/8593[here].
 +
-Note that in one of the following steps you will need to configure a Github token for **this** user in **your** extension repository.
+Note that in one of the following steps you will need to configure a GitHub token for **this** user in **your** extension repository.
 The user can be a regular user (for example the author of the extension) or a bot.
 
 2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
@@ -44,9 +44,9 @@ An example of the above configuration can be found https://github.com/quarkusio/
 3. Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
 in order to open and close the issue from the CI action.
 
-4. Add the following file to configure the Quarkus CI in Github Actions for your repository:
+4. Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
 +
-`.github/workflows/quarkus-snapshot.yaml` (this file contains the actual Github Actions declaration)
+`.github/workflows/quarkus-snapshot.yaml` (this file contains the actual GitHub Actions declaration)
 +
 [source,yaml]
 ----
@@ -105,21 +105,21 @@ jobs:
 
 Finally, if your extension requires a custom test script (by default `quarkus-ecosystem-test` from this repository is used), add a file named `.github/quarkus-ecosystem-test`.
 
-Example projects containing the proper Github Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/master/.github[here].
+Example projects containing the proper GitHub Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/master/.github[here].
 
 === How to create a token for use with Ecosystem CI
 
-In case you haven't created a Github token before, the process is roughly as follows:
+In case you haven't created a GitHub token before, the process is roughly as follows.
 
 You can generate a token by accessing https://github.com/settings/tokens and clicking on `Generate new token`. On the page that comes up,
 provide a name,  select `repo` scope and click on `Generate token` at the bottom of the page. You will be prompted with the newly generated token, but be sure to copy it wherever
 it is needed, because you won't be able to see it again.
 
-Now that you have created the token, you need to create Github Secret with its value, by first accessing `/settings/secrets` in your repository, then adding a new secret named `ECOSYSTEM_CI_TOKEN`
+Now that you have created the token, you need to create a GitHub Secret with its value, by first accessing `/settings/secrets` in your repository, then adding a new secret named `ECOSYSTEM_CI_TOKEN`
 where you simply paste the contents of the token and save by clicking on `Add token`.
 
 == How come this works?
 
-The "trick" (more like a hack actually) is that Quarkus Platform participant's Github Actions are triggered when the Quarkus Ecosystem CI stars the extension repository.
+The "trick" (more like a hack actually) is that Quarkus Platform participant's GitHub Actions are triggered when the Quarkus Ecosystem CI stars the extension repository.
 Furthermore, before starring the repository, some context information is written to this repository which is then meant to be read in the triggered Github Action.
 This way this Quarkus Github Action does not need to hold any secrets for the participants.
