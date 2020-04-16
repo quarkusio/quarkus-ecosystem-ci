@@ -1,0 +1,28 @@
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# IDEA
+.idea
+*.ipr
+*.iml
+*.iws
+
+# IDEA lsp plugin
+lsp/
+
+# NetBeans
+nb-configuration.xml
+
+# OSX
+.DS_Store
+
+# VS CODE
+.vscode
+*.code-workspace
+.factorypath
+
+# Vi/Vim
+*.swp
