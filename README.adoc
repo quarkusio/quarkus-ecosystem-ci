@@ -1,5 +1,5 @@
 = quarkus-ecosystem-ci
-:plantuml: http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/quarkusio/quarkus-ecosystem-ci/master/
+:plantuml: http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/quarkusio/quarkus-ecosystem-ci/master/
 
 Repository used for orchestrating cross-CI builds of extensions part of Quarkus ecosystem/universe.
 
