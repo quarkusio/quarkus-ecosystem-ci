@@ -1,0 +1,4 @@
+url: https://github.com/ppalaga/camel-quarkus # Github repo of your extension
+issues:
+  repo: quarkusio/quarkus # this should be left as is when CI updates are going to be reported on the Quarkus repository
+  latestCommit: 8694 # this is the number of the issue you created above
