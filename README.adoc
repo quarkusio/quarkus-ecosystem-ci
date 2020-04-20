@@ -1,6 +1,8 @@
 = quarkus-ecosystem-ci
 :plantuml: http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/quarkusio/quarkus-ecosystem-ci/master/
 
+image:https://img.shields.io/github/issues/quarkusio/quarkus/triage/ci-participant?label=ci-participant%20issues&logo=quarkus[link=https://github.com/quarkusio/quarkus/labels/triage%2Fci-participant]
+
 Repository used for orchestrating cross-CI builds of extensions part of Quarkus ecosystem/universe.
 
 == What it's all about
