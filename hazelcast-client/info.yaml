@@ -1,0 +1,4 @@
+url: https://github.com/hazelcast/quarkus-hazelcast-client
+issues:
+  repo: quarkusio/quarkus
+  latestCommit: 8893
