@@ -1,0 +1,4 @@
+url: https://github.com/datastax/cassandra-quarkus
+issues:
+  repo: quarkusio/quarkus
+  latestCommit: 9183
