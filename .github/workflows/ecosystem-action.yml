@@ -25,6 +25,9 @@ jobs:
       - name: Launch CI for each member
         working-directory: ecosystem-ci
         run: |
+          #get the sha or the latest master
+          QUARKUS_SHA=$(git ls-remote https://github.com/quarkusio/quarkus master | awk '{print $1;}')
+
           for member in */ ; do
               cd "$member"
 
@@ -42,6 +45,7 @@ jobs:
               yq w -i context.yaml issues.latestCommit "${LATEST_COMMIT_ISSUE_NUM}"
               yq w -i context.yaml issues.repo "${ISSUE_REPO}"
               yq w -i context.yaml quarkus.version "999-SNAPSHOT"
+              yq w -i context.yaml quarkus.sha "${QUARKUS_SHA}"
 
               # commit changes
               git config --local user.email "quarkusbot@xam.dk"

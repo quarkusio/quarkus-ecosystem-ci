@@ -5,6 +5,20 @@ cd ecosystem-ci/${ECOSYSTEM_CI_REPO_PATH}
 ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.latestCommit)
 ISSUE_REPO=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.repo)
 QUARKUS_VERSION=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.version)
+QUARKUS_SHA=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.sha)
+cd - > /dev/null
+
+# Build Quarkus
+
+# a depth of 1 should be fine because this runs almost as soon as the original value of QUARKUS_SHA was created,
+# but lets be on the safe side by pulling in some more history
+git clone --depth=20 --branch master https://github.com/quarkusio/quarkus.git
+cd quarkus
+git checkout ${QUARKUS_SHA}
+
+# perform the actual build
+./mvnw clean install -DskipTests -DskipITs -DskipDocs
+
 cd - > /dev/null
 
 # perform actual test run
