@@ -1,7 +1,7 @@
-timestamp: 2020-05-19_05-01-28
+timestamp: 2020-05-22_06-32-16
 issues:
   latestCommit: 8646
   repo: quarkusio/quarkus
 quarkus:
   version: 999-SNAPSHOT
-  sha: bb228f1fef4f0d147fb37d82f415d6cd531cc321
+  sha: 341a17c9ee0b5fc15b808c1dc7dc16709ae61bc1
