@@ -17,7 +17,7 @@ cd quarkus
 git checkout ${QUARKUS_SHA}
 
 # perform the actual build
-./mvnw clean install -DskipTests -DskipITs -DskipDocs
+./mvnw -B clean install -DskipTests -DskipITs -DskipDocs
 
 cd - > /dev/null
 
