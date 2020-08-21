@@ -1,0 +1,4 @@
+url: https://github.com/quarkusio/code.quarkus.io
+issues:
+  repo: quarkusio/quarkus # this should be left as is when CI updates are going to be reported on the Quarkus repository
+  latestCommit: 11515 
