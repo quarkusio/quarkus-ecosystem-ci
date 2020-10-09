@@ -64,7 +64,7 @@ sudo apt-get install -y gnupg2 gnupg-agent
 echo "Installing SDKMAN"
 curl -s "https://get.sdkman.io" | bash
 source ~/.sdkman/bin/sdkman-init.sh
-sdk install jbang 0.21.0
+sdk install jbang 0.50.1
 
 jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}"
 
