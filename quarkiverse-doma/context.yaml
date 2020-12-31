@@ -1,7 +1,7 @@
-timestamp: 2020-12-30_05-16-47
+timestamp: 2020-12-31_05-19-44
 issues:
   latestCommit: 13
   repo: quarkiverse/quarkiverse
 quarkus:
   version: 999-SNAPSHOT
-  sha: 7828a5cc465ef58e63c9b1fa72576657917de1fc
+  sha: 7ad806baca187d1d744a927bcfe691949d03f6f4
