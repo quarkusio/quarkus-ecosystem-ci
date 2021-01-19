@@ -1,4 +1,4 @@
-url: https://github.com/quarkiverse/quarkiverse-github-api
+url: https://github.com/quarkiverse/quarkus-github-api
 issues:
   repo: quarkiverse/quarkiverse
   latestCommit: 18
