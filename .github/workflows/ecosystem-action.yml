@@ -56,7 +56,7 @@ jobs:
               echo "Commited context changes for ${REPOSITORY}"
               
               # check if repository has been starred
-              STARRED_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --request GET --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
+              STARRED_HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --request GET --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
               if [[ ${STARRED_HTTP_CODE} != 204 ]] && [[ ${STARRED_HTTP_CODE} != 404 ]]; then
                 echo "Unexpected http response status (${STARRED_HTTP_CODE}) received when checking star status"
                 exit 1
@@ -65,7 +65,7 @@ jobs:
               # we need to unstar the repo so we can star it again in order for the trigger to work
               if [[ ${STARRED_HTTP_CODE} = 204 ]]; then
                 echo "Repository ${REPOSITORY} has already been starred, so we first need to unstar it"
-                CHANGE_STAR_STATUS_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --request DELETE --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
+                CHANGE_STAR_STATUS_HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --request DELETE --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
                 if [[ ${CHANGE_STAR_STATUS_HTTP_CODE} != 204 ]]; then
                   echo "Unexpected http response status (${CHANGE_STAR_STATUS_HTTP_CODE}) received when unstarring repository ${REPOSITORY}"
                   exit 1
@@ -74,7 +74,7 @@ jobs:
               fi
 
               # star the repository
-              CHANGE_STAR_STATUS_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --request PUT --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
+              CHANGE_STAR_STATUS_HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --request PUT --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
               if [[ ${CHANGE_STAR_STATUS_HTTP_CODE} != 204 ]]; then
                 echo "Unexpected http response status (${CHANGE_STAR_STATUS_HTTP_CODE}) received when starring repository ${REPOSITORY}"
                 exit 1
