@@ -2,15 +2,18 @@
 set -e
 
 cd ecosystem-ci/${ECOSYSTEM_CI_REPO_PATH}
-# if ISSUE_NUM was not specified, read it from the context file
-if [[ -z "${ISSUE_NUM}" ]]; then
+# if an alternative is not specified, then we just read the global info
+if [[ -z "${ALTERNATIVE}" ]]; then
   ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.latestCommit)
+  QUARKUS_SHA=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.sha)
+else
+  ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} alternatives.${ALTERNATIVE}.issue)
+  QUARKUS_BRANCH=$(yq r ${ECOSYSTEM_CI_REPO_FILE} alternatives.${ALTERNATIVE}.quarkusBranch)
 fi
+# we assume that the issue repository doesn't change between alternatives
 ISSUE_REPO=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.repo)
 # we assume that this version correct no matter what Quarkus source we checkout
 QUARKUS_VERSION=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.version)
-# this will only be used if QUARKUS_BRANCH is not set
-QUARKUS_SHA=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.sha)
 cd - > /dev/null
 
 # Checkout Quarkus
