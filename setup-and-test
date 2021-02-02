@@ -2,26 +2,41 @@
 set -e
 
 cd ecosystem-ci/${ECOSYSTEM_CI_REPO_PATH}
-ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.latestCommit)
+# if an alternative is not specified, then we just read the global info
+if [[ -z "${ALTERNATIVE}" ]]; then
+  ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.latestCommit)
+  QUARKUS_SHA=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.sha)
+else
+  ISSUE_NUM=$(yq r ${ECOSYSTEM_CI_REPO_FILE} alternatives.${ALTERNATIVE}.issue)
+  QUARKUS_BRANCH=$(yq r ${ECOSYSTEM_CI_REPO_FILE} alternatives.${ALTERNATIVE}.quarkusBranch)
+fi
+# we assume that the issue repository doesn't change between alternatives
 ISSUE_REPO=$(yq r ${ECOSYSTEM_CI_REPO_FILE} issues.repo)
+# we assume that this version correct no matter what Quarkus source we checkout
 QUARKUS_VERSION=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.version)
-QUARKUS_SHA=$(yq r ${ECOSYSTEM_CI_REPO_FILE} quarkus.sha)
 cd - > /dev/null
 
+# Checkout Quarkus
+if [[ -z "${QUARKUS_BRANCH}" ]]; then
+  # a depth of 1 should be fine because this runs almost as soon as the original value of QUARKUS_SHA was created,
+  # but lets be on the safe side by pulling in some more history
+  git clone --depth=20 --branch master https://github.com/quarkusio/quarkus.git
+  cd quarkus
+  git checkout ${QUARKUS_SHA}
+else
+  # if a branch was specified, then just check that out
+  git clone --depth=1 --branch ${QUARKUS_BRANCH} https://github.com/quarkusio/quarkus.git
+  cd quarkus
+fi
+
 # Build Quarkus
-
-# a depth of 1 should be fine because this runs almost as soon as the original value of QUARKUS_SHA was created,
-# but lets be on the safe side by pulling in some more history
-git clone --depth=20 --branch master https://github.com/quarkusio/quarkus.git
-cd quarkus
-git checkout ${QUARKUS_SHA}
-
-# perform the actual build
 ./mvnw -B clean install -DskipTests -DskipITs -DskipDocs
 
 cd - > /dev/null
 
-# perform actual test run
+# delete the quarkus repository in order to allow multiple consecutive executions of this script
+rm -rf quarkus
+
 cd current-repo
 
 # check the test script
@@ -48,6 +63,7 @@ else
     cp ../ecosystem-ci/quarkus-ecosystem-maven-settings.xml .github/quarkus-ecosystem-maven-settings.xml
 fi
 
+# perform actual test run
 if QUARKUS_VERSION=${QUARKUS_VERSION} .github/quarkus-ecosystem-test ; then
   echo "Tests succeeded"
   TEST_STATUS="success"

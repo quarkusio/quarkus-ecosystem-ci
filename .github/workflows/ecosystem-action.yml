@@ -47,6 +47,18 @@ jobs:
               yq w -i context.yaml quarkus.version "999-SNAPSHOT"
               yq w -i context.yaml quarkus.sha "${QUARKUS_SHA}"
 
+              # delete previous alternatives
+              yq d -i ecosystem-ci/kogito-quarkus/context.yaml alternatives
+              # if alternatives is set in info.yaml, then copy it to context.yaml
+              alts=$(yq r info.yaml alternatives)
+              if [ -n "${alts}" ]; then
+                echo "altenatives:" >> context.yaml
+                list=$(yq r info.yaml alternatives)
+                while IFS= read -r line; do
+                  echo "  $line" >> context.yaml
+                done <<< "$alts"
+              fi
+
               # commit changes
               git config --local user.email "quarkusbot@xam.dk"
               git config --local user.name "Quarkus Bot"
