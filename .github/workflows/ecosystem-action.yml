@@ -48,7 +48,7 @@ jobs:
               yq w -i context.yaml quarkus.sha "${QUARKUS_SHA}"
 
               # delete previous alternatives
-              yq d -i ecosystem-ci/kogito-quarkus/context.yaml alternatives
+              yq d -i context.yaml alternatives
               # if alternatives is set in info.yaml, then copy it to context.yaml
               alts=$(yq r info.yaml alternatives)
               if [ -n "${alts}" ]; then
