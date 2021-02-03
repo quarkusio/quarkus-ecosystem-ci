@@ -2,3 +2,7 @@ url: https://github.com/kiegroup/kogito-runtimes # Github repo of your extension
 issues:
   repo: quarkusio/quarkus # this should be left as is when CI updates are going to be reported on the Quarkus repository
   latestCommit: 12486 # this is the number of the issue you created above
+alternatives:
+  lts:
+    issue: XXXX # some new issue number
+    quarkusBranch: 1.11
