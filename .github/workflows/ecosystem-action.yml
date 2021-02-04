@@ -52,7 +52,7 @@ jobs:
               # if alternatives is set in info.yaml, then copy it to context.yaml
               alts=$(yq r info.yaml alternatives)
               if [ -n "${alts}" ]; then
-                echo "altenatives:" >> context.yaml
+                echo "alternatives:" >> context.yaml
                 list=$(yq r info.yaml alternatives)
                 while IFS= read -r line; do
                   echo "  $line" >> context.yaml
