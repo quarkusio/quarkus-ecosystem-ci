@@ -4,5 +4,5 @@ issues:
   latestCommit: 12486 # this is the number of the issue for master check
 alternatives:
   lts:
-    issue: 14791 # this is the number of the issue for LTS check
+    issue: 14860 # this is the number of the issue for LTS check
     quarkusBranch: 1.11
