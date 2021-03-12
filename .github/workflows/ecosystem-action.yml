@@ -25,8 +25,8 @@ jobs:
       - name: Launch CI for each member
         working-directory: ecosystem-ci
         run: |
-          #get the sha or the latest master
-          QUARKUS_SHA=$(git ls-remote https://github.com/quarkusio/quarkus master | awk '{print $1;}')
+          #get the sha or the latest main
+          QUARKUS_SHA=$(git ls-remote https://github.com/quarkusio/quarkus main | awk '{print $1;}')
 
           for member in */ ; do
               cd "$member"
