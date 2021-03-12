@@ -90,7 +90,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: current-repo
-          ref: master
+          ref: main
 
       - name: Checkout Ecosystem
         uses: actions/checkout@v2
@@ -107,7 +107,7 @@ jobs:
 
 Finally, if your extension requires a custom test script (by default `quarkus-ecosystem-test` from this repository is used), add a file named `.github/quarkus-ecosystem-test`.
 
-Example projects containing the proper GitHub Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/master/.github[here].
+Example projects containing the proper GitHub Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/main/.github[here].
 
 === How to create a token for use with Ecosystem CI
 

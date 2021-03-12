@@ -20,7 +20,7 @@ cd - > /dev/null
 if [[ -z "${QUARKUS_BRANCH}" ]]; then
   # a depth of 1 should be fine because this runs almost as soon as the original value of QUARKUS_SHA was created,
   # but lets be on the safe side by pulling in some more history
-  git clone --depth=20 --branch master https://github.com/quarkusio/quarkus.git
+  git clone --depth=20 --branch main https://github.com/quarkusio/quarkus.git
   cd quarkus
   git checkout ${QUARKUS_SHA}
 else
