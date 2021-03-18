@@ -39,6 +39,18 @@ rm -rf quarkus
 
 cd current-repo
 
+# check prerequisites script
+if [ -f .github/ci-prerequisites.sh ]; then
+    echo "Prerequisites script found"
+else
+    echo "Prerequisites script not found - using default from quarkus-ecosystem-ci"
+    cp ../ecosystem-ci/ci-prerequisites.sh .github/ci-prerequisites.sh
+fi
+
+if .github/ci-prerequisites.sh ; then
+  echo "Prerequisites script done"
+fi
+
 # check the test script
 if [ -f .github/quarkus-ecosystem-test ]; then
     echo "Test script found"
