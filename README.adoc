@@ -24,6 +24,7 @@ image::{plantuml}/ci-overview.puml[CI Overview]
 After your extension has been added to the Quarkus Platform, you will additionally need to do the following:
 
 1. Open an issue in https://github.com/quarkusio/quarkus/issues[the Quarkus issue tracker], where updates will be posted (the CI job will close or open the issue depending on the CI outcome).
+For Quarkiverse extensions, it is suggested to use https://github.com/quarkiverse/quarkiverse/issues[the Quarkiverse issue tracker].
 An example of such an issue can be found https://github.com/quarkusio/quarkus/issues/8593[here].
 +
 Note that in one of the following steps you will need to configure a GitHub token for **this** user in **your** extension repository.
@@ -45,6 +46,8 @@ An example of the above configuration can be found https://github.com/quarkusio/
 
 3. Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
 in order to open and close the issue from the CI action.
++
+This step is not needed for Quarkiverse extensions which work out of the box.
 
 4. Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
 +
@@ -90,13 +93,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: current-repo
-          ref: main
 
       - name: Checkout Ecosystem
         uses: actions/checkout@v2
         with:
           repository: ${{ env.ECOSYSTEM_CI_REPO }}
-          ref: master
           path: ecosystem-ci
 
       - name: Setup and Run Tests
