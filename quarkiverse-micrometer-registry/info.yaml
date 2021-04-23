@@ -2,3 +2,7 @@ url: https://github.com/quarkiverse/quarkus-micrometer-registry
 issues:
   repo: quarkiverse/quarkiverse
   latestCommit: 24
+alternatives:
+  lts:
+    issue: 40 # this is the number of the issue for LTS check
+    quarkusBranch: 1.13
