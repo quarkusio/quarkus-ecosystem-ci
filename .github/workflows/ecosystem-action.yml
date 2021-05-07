@@ -20,7 +20,7 @@ jobs:
           repository: ${{ env.GITHUB_REPOSITORY }}
           path: ecosystem-ci
           token: ${{ secrets.ECOSYSTEM_CI_TOKEN }}
-          ref: master
+          ref: main
 
       - name: Launch CI for each member
         working-directory: ecosystem-ci
