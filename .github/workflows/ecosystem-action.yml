@@ -31,29 +31,30 @@ jobs:
           for member in */ ; do
               cd "$member"
 
-              URL=$(yq r info.yaml url)
+              URL=$(yq e '.url' info.yaml)
               REPOSITORY=$(echo "${URL/https:\/\/github.com\//}")
               echo "Attempting to launch CI for ${REPOSITORY}"
 
               # read static information from info.yaml
-              LATEST_COMMIT_ISSUE_NUM=$(yq r info.yaml issues.latestCommit)
-              ISSUE_REPO=$(yq r info.yaml issues.repo)
+              LATEST_COMMIT_ISSUE_NUM=$(yq e '.issues.latestCommit' info.yaml)
+              ISSUE_REPO=$(yq e '.issues.repo' info.yaml)
 
               # here is where we will write all context information
               touch context.yaml
-              yq w -i context.yaml timestamp "$(date +"%Y-%m-%d_%H-%M-%S")"
-              yq w -i context.yaml issues.latestCommit "${LATEST_COMMIT_ISSUE_NUM}"
-              yq w -i context.yaml issues.repo "${ISSUE_REPO}"
-              yq w -i context.yaml quarkus.version "999-SNAPSHOT"
-              yq w -i context.yaml quarkus.sha "${QUARKUS_SHA}"
+              
+              yq e ".timestamp = \"$(date +'%Y-%m-%d_%H-%M-%S')\"" context.yaml -i
+              yq e ".issues.latestCommit = \"${LATEST_COMMIT_ISSUE_NUM}\"" context.yaml -i
+              yq e ".issues.repo = \"${ISSUE_REPO}\"" context.yaml -i
+              yq e ".quarkus.version = \"999-SNAPSHOT\"" context.yaml -i
+              yq e ".quarkus.sha = \"${QUARKUS_SHA}\"" context.yaml -i
 
               # delete previous alternatives
-              yq d -i context.yaml alternatives
+              yq e 'del(.alternatives)' context.yaml -i
               # if alternatives is set in info.yaml, then copy it to context.yaml
-              alts=$(yq r info.yaml alternatives)
+              alts=$(yq e '.alternatives' info.yaml)
               if [ -n "${alts}" ]; then
                 echo "alternatives:" >> context.yaml
-                list=$(yq r info.yaml alternatives)
+                list=$(yq e '.alternatives' info.yaml)
                 while IFS= read -r line; do
                   echo "  $line" >> context.yaml
                 done <<< "$alts"
