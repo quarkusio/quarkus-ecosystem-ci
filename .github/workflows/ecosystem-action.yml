@@ -8,7 +8,7 @@ on:
 
 jobs:
   invoke-ci:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: "Invoke CI"
     steps:
       - name: Install yq
