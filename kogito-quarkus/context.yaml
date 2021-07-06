@@ -1,10 +1,10 @@
-timestamp: 2021-07-05_05-01-40
+timestamp: 2021-07-06_05-01-35
 issues:
   latestCommit: "12486"
   repo: quarkusio/quarkus
 quarkus:
   version: 999-SNAPSHOT
-  sha: 4c1c4f53f6d5a147c28ebf6b5bf69e6f52145c5f
+  sha: b900fc3ad0a0ec05e545fd339622e403451571b5
 alternatives:
   lts:
     issue: 14860 # this is the number of the issue for LTS check
