@@ -5,4 +5,4 @@ issues:
 alternatives:
   lts:
     issue: 14860 # this is the number of the issue for LTS check
-    quarkusBranch: 1.11
+    quarkusBranch: 2.2
