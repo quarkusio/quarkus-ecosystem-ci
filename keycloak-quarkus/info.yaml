@@ -1,0 +1,4 @@
+url: https://https://github.com/keycloak/keycloak # Github repo of your extension
+issues:
+  repo: quarkusio/quarkus # this should be left as is when CI updates are going to be reported on the Quarkus repository
+  latestCommit: 123456 # this is the number of the issue for main check
