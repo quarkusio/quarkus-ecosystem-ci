@@ -32,7 +32,7 @@ The user can be a regular user (for example the author of the extension) or a bo
 
 2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`. Name of the directory is not important, just attempt to follow same naming conventions used for similar projects.
 +
-The needs to contain the following information:
+The file needs to contain the following information:
 +
 [source,yaml]
 ----
@@ -44,12 +44,11 @@ issues:
 +
 An example of the above configuration can be found https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml[here].
 
-3. If your project is NOT in https://github.com/quarkiverse you need to add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
-in order to open and close the issue from the CI action.
-+
-For Quarkiverse project this is automatically setup.
+The following steps are only needed if your project is NOT a Quarkiverse participant (i.e. not a project of the https://github.com/quarkiverse[Quarkiverse] organization), as Quarkiverse projects are already set up this way:
 
-4. Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
+- Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used in order to open and close the issue from the CI action.
+
+- Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
 +
 `.github/workflows/quarkus-snapshot.yaml` (this file contains the actual GitHub Actions declaration)
 +
