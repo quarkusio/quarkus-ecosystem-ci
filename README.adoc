@@ -44,10 +44,10 @@ issues:
 +
 An example of the above configuration can be found https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml[here].
 
-3. Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
+3. If your project is NOT in https://github.com/quarkiverse you need to add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used
 in order to open and close the issue from the CI action.
 +
-This step is not needed for Quarkiverse extensions which work out of the box.
+For Quarkiverse project this is automatically setup.
 
 4. Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
 +
