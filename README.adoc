@@ -27,8 +27,8 @@ After your extension has been added to the Quarkus Platform, you will additional
 For Quarkiverse extensions, it is suggested to use https://github.com/quarkiverse/quarkiverse/issues[the Quarkiverse issue tracker].
 An example of such an issue can be found https://github.com/quarkusio/quarkus/issues/8593[here].
 +
-Note that in one of the following steps you will need to configure a GitHub token for **this** user in **your** extension repository.
-The user can be a regular user (for example the author of the extension) or a bot.
+Note that in one of the following steps you will need to configure a GitHub token for the user who created the issue in **your** extension repository.
+The user can be a regular user (for example the author of the extension) or a bot. This is so the automation can open/close the issue.
 
 2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
 +
