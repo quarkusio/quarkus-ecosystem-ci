@@ -1,0 +1,4 @@
+url: https://github.com/quarkiverse/quarkus-operator-sdk
+issues:
+  repo: quarkusio/quarkus
+  latestCommit: 64
