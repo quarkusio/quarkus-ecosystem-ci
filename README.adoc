@@ -30,7 +30,7 @@ An example of such an issue can be found https://github.com/quarkusio/quarkus/is
 Note that in one of the following steps you will need to configure a GitHub token for the user who created the issue in **your** extension repository.
 The user can be a regular user (for example the author of the extension) or a bot. This is so the automation can open/close the issue.
 
-2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`.
+2. Open a Pull Request to this https://github.com/quarkusio/quarkus-ecosystem-ci[quarkus-ecosystem-ci] repository where you add a directory for your extension and inside it place a file named `info.yaml`. Name of the directory is not important, just attempt to follow same naming conventions used for similar projects.
 +
 The needs to contain the following information:
 +
