@@ -15,7 +15,7 @@ import java.io.UncheckedIOException;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "report", mixinStandardHelpOptions = true,
-		description = "Takes care of updating the an issue depending on the status of the build")
+		description = "Takes care of updating an issue depending on the status of the build")
 class Report implements Runnable {
 
 	@Option(names = "token", description = "Github token to use when calling the Github API")
