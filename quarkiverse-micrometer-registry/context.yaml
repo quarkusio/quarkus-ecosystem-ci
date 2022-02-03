@@ -1,10 +1,10 @@
-timestamp: 2022-02-02_05-05-19
+timestamp: 2022-02-03_05-05-17
 issues:
   latestCommit: "24"
   repo: quarkiverse/quarkiverse
 quarkus:
   version: 999-SNAPSHOT
-  sha: 8280c5349e2b40a5cc61388f91c653d1cfab93fc
+  sha: 047180b5b3d1916de98bca121fd8f9b3b723eeab
 alternatives:
   lts:
     issue: 40 # this is the number of the issue for LTS check
