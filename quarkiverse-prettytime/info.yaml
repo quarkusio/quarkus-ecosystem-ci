@@ -2,3 +2,7 @@ url: https://github.com/quarkiverse/quarkus-prettytime
 issues:
   repo: quarkiverse/quarkiverse
   latestCommit: 33
+alternatives:
+  "3.0":
+    issue: "33"
+    quarkusBranch: "3.0"
