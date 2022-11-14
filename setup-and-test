@@ -7,8 +7,8 @@ if [[ -z "${ALTERNATIVE}" ]]; then
   ISSUE_NUM=$(yq e '.issues.latestCommit' ${ECOSYSTEM_CI_REPO_FILE})
   QUARKUS_SHA=$(yq e '.quarkus.sha' ${ECOSYSTEM_CI_REPO_FILE})
 else
-  ISSUE_NUM=$(yq e ".alternatives.${ALTERNATIVE}.issue" ${ECOSYSTEM_CI_REPO_FILE})
-  QUARKUS_BRANCH=$(yq e ".alternatives.${ALTERNATIVE}.quarkusBranch" ${ECOSYSTEM_CI_REPO_FILE})
+  ISSUE_NUM=$(yq e ".alternatives.\"${ALTERNATIVE}\".issue" ${ECOSYSTEM_CI_REPO_FILE})
+  QUARKUS_BRANCH=$(yq e ".alternatives.\"${ALTERNATIVE}\".quarkusBranch" ${ECOSYSTEM_CI_REPO_FILE})
 fi
 # we assume that the issue repository doesn't change between alternatives
 ISSUE_REPO=$(yq e '.issues.repo' ${ECOSYSTEM_CI_REPO_FILE})
