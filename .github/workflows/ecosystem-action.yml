@@ -12,10 +12,10 @@ jobs:
     name: "Invoke CI"
     steps:
       - name: Install yq
-        run: sudo add-apt-repository ppa:rmescandon/yq && sudo apt update && sudo apt install yq -y
+        uses: dcarbone/install-yq-action@v1.0.1
 
       - name: Checkout Ecosystem
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ env.GITHUB_REPOSITORY }}
           path: ecosystem-ci
