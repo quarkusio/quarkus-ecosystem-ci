@@ -8,8 +8,15 @@ if [[ -z "${ALTERNATIVE}" ]]; then
   QUARKUS_SHA=$(yq e '.quarkus.sha' ${ECOSYSTEM_CI_REPO_FILE})
   QUARKUS_VERSION=$(yq e '.quarkus.version' ${ECOSYSTEM_CI_REPO_FILE})
 else
-  ISSUE_NUM=$(yq e ".alternatives.\"${ALTERNATIVE}\".issue" ${ECOSYSTEM_CI_REPO_FILE})
-  QUARKUS_BRANCH=$(yq e ".alternatives.\"${ALTERNATIVE}\".quarkusBranch" ${ECOSYSTEM_CI_REPO_FILE})
+  # Check if the alternative exists
+  if [[ "$(yq e '.alternatives|has(env(ALTERNATIVE))' ${ECOSYSTEM_CI_REPO_FILE})" ]] ; then
+    ISSUE_NUM=$(yq e ".alternatives.\"${ALTERNATIVE}\".issue" ${ECOSYSTEM_CI_REPO_FILE})
+    QUARKUS_BRANCH=$(yq e ".alternatives.\"${ALTERNATIVE}\".quarkusBranch" ${ECOSYSTEM_CI_REPO_FILE})
+  else
+    # If the requested alternative does not exist, use it as the target branch and reuse issue number
+    ISSUE_NUM=$(yq e '.issues.latestCommit' ${ECOSYSTEM_CI_REPO_FILE})
+    QUARKUS_BRANCH = $ALTERNATIVE;
+  fi
 fi
 # we assume that the issue repository doesn't change between alternatives
 ISSUE_REPO=$(yq e '.issues.repo' ${ECOSYSTEM_CI_REPO_FILE})
