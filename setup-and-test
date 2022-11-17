@@ -21,7 +21,7 @@ else
   else
     # If the requested alternative does not exist, use it as the target branch and reuse issue number
     ISSUE_NUM=$(yq e '.issues.latestCommit' ${ECOSYSTEM_CI_REPO_FILE})
-    QUARKUS_BRANCH = $ALTERNATIVE;
+    QUARKUS_BRANCH=$ALTERNATIVE;
   fi
 fi
 # we assume that the issue repository doesn't change between alternatives
