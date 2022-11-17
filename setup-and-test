@@ -7,6 +7,12 @@ if [[ -z "${ALTERNATIVE}" ]]; then
   ISSUE_NUM=$(yq e '.issues.latestCommit' ${ECOSYSTEM_CI_REPO_FILE})
   QUARKUS_SHA=$(yq e '.quarkus.sha' ${ECOSYSTEM_CI_REPO_FILE})
   QUARKUS_VERSION=$(yq e '.quarkus.version' ${ECOSYSTEM_CI_REPO_FILE})
+
+  # Detect if Quarkus 3.0 is used and point to the correct branch
+  if [[ "$(mvn help:evaluate -Dexpression=quarkus.version -q -DforceStdout -f ../../current-repo/pom.xml| cut -d. -f1,2)" = "3.0" ]]; then
+      QUARKUS_BRANCH="jakarta-rewrite"
+      QUARKUS_VERSION="999-jakarta-SNAPSHOT"
+  fi
 else
   # Check if the alternative exists
   if [[ "$(yq e '.alternatives|has(env(ALTERNATIVE))' ${ECOSYSTEM_CI_REPO_FILE})" ]] ; then
