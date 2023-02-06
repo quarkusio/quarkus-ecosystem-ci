@@ -9,7 +9,18 @@ if [[ -z "${ALTERNATIVE}" ]]; then
   QUARKUS_VERSION=$(yq e '.quarkus.version' ${ECOSYSTEM_CI_REPO_FILE})
 
   # Detect if Quarkus 2.x is used and point to the correct branch
-  if [[ "$(mvn help:evaluate -Dexpression=quarkus.version -q -DforceStdout -f ../../current-repo/pom.xml| cut -d. -f1)" = "2" ]]; then
+  REPO_PATH=../../current-repo
+  POM_PROPERTY=quarkus.version
+
+  if [[ ! -z "${QUARKUS_VERSION_POM_PATH}" ]]; then
+    REPO_PATH="${REPO_PATH}/${QUARKUS_VERSION_POM_PATH}"
+  fi
+
+  if [[ ! -z "${QUARKUS_VERSION_POM_PROPERTY}" ]]; then
+    POM_PROPERTY=${QUARKUS_VERSION_POM_PROPERTY}
+  fi
+
+  if [[ "$(mvn help:evaluate -Dexpression=${POM_PROPERTY} -q -DforceStdout -f ${REPO_PATH}/pom.xml| cut -d. -f1)" = "2" ]]; then
       QUARKUS_BRANCH="2.16"
       QUARKUS_VERSION="2.16.999-SNAPSHOT"
   fi
