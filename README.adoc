@@ -74,6 +74,20 @@ env:
 
   ECOSYSTEM_CI_REPO_PATH: FIXME # TODO: this needs to be set to the directory name added in 'quarkusio/quarkus-ecosystem-ci'
 
+  ###################################
+  # Optional repo specific settings #
+  ###################################
+
+  # The setup-and-test script assumes the pom.xml file is at the root of your repo
+  # Use this env var to add a nested path within your repo where pom.xml is
+  QUARKUS_VERSION_POM_PATH: PATH_WHERE_POM_XML_IS  
+
+  # The setup-and-test script assumes the property within pom.xml that determines the
+  # quarkus version is called "quarkus.version".
+  # Use this env var to override the property to something else
+  # (like "quarkus.platform.version" for example)
+  QUARKUS_VERSION_POM_PROPERTY: quarkus.version
+
 jobs:
   build:
     name: "Build against latest Quarkus snapshot"
