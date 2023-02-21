@@ -5,7 +5,3 @@ issues:
 quarkus:
   version: 999-SNAPSHOT
   sha: 37e72226cf71b36a6f8162db8747586ffa8ef413
-alternatives:
-  lts:
-    issue: 40 # this is the number of the issue for LTS check
-    quarkusBranch: 1.13
