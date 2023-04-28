@@ -1,0 +1,8 @@
+url: https://github.com/vaadin/quarkus
+issues:
+  repo: vaadin/quarkus
+  latestCommit: 108
+alternatives:
+    2.x:
+      issue: 109
+      quarkusBranch: "2.16"
