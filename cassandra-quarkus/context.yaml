@@ -1,9 +1,9 @@
-timestamp: 2023-06-19_05-00-59
+timestamp: 2023-06-20_05-01-25
 issues:
   latestCommit: "9183"
   repo: quarkusio/quarkus
 quarkus:
   version: 999-SNAPSHOT
-  sha: c099fb8bd05cb826f9154ea3fc7675666c760966
+  sha: 0ff84713efa5212bb38e807ea07481a820e5ac28
 alternatives:
   null
