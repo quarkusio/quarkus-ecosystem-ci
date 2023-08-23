@@ -1,0 +1,8 @@
+url: https://github.com/mcollovati/quarkus-hilla
+issues:
+  repo: mcollovati/quarkus-hilla
+  latestCommit: 215
+alternatives:
+    2.x:
+      issue: 216
+      quarkusBranch: "2.16"
