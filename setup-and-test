@@ -68,7 +68,7 @@ source ~/.sdkman/bin/sdkman-init.sh
 sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/config
 
 echo "Installing jbang"
-sdk install jbang 0.50.1
+sdk install jbang 0.110.1
 
 
 echo "Building Quarkus"
@@ -77,6 +77,16 @@ if ./mvnw -B clean install -DskipTests -DskipITs -DskipDocs -Prelocations ; then
 else
   echo "Failed to build Quarkus"
   jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}"
+  exit 1
+fi
+
+echo "Installing Quarkus CLI"
+jbang app install --force --name quarkus "${HOME}/.m2/repository/io/quarkus/quarkus-cli/${QUARKUS_VERSION}/quarkus-cli-${QUARKUS_VERSION}-runner.jar"
+export PATH="${HOME}/.jbang/bin:${PATH}"
+if quarkus --version; then
+  echo "Quarkus CLI installed successfully"
+else
+  echo "Failed to install Quarkus CLI"
   exit 1
 fi
 
