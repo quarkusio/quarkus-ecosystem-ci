@@ -80,16 +80,6 @@ else
   exit 1
 fi
 
-echo "Installing Quarkus CLI"
-jbang app install --force --name quarkus "${HOME}/.m2/repository/io/quarkus/quarkus-cli/${QUARKUS_VERSION}/quarkus-cli-${QUARKUS_VERSION}-runner.jar"
-export PATH="${HOME}/.jbang/bin:${PATH}"
-if quarkus --version; then
-  echo "Quarkus CLI installed successfully"
-else
-  echo "Failed to install Quarkus CLI"
-  exit 1
-fi
-
 cd - > /dev/null
 
 # delete the quarkus repository in order to allow multiple consecutive executions of this script
