@@ -44,7 +44,7 @@ issues:
 +
 An example of the above configuration can be found https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml[here].
 
-=== What if my repository is not in the Quarkiverse organization? 
+=== What if my repository is not in the Quarkiverse organization?
 
 The following steps are only needed if your project is NOT a Quarkiverse participant (i.e. not a project of the https://github.com/quarkiverse[Quarkiverse] organization), as Quarkiverse projects are already set up this way:
 
@@ -82,7 +82,7 @@ env:
 
   # The setup-and-test script assumes the pom.xml file is at the root of your repo
   # Use this env var to add a nested path within your repo where pom.xml is
-  QUARKUS_VERSION_POM_PATH: PATH_WHERE_POM_XML_IS  
+  QUARKUS_VERSION_POM_PATH: PATH_WHERE_POM_XML_IS
 
   # The setup-and-test script assumes the property within pom.xml that determines the
   # quarkus version is called "quarkus.version".
@@ -137,6 +137,11 @@ it is needed, because you won't be able to see it again.
 
 Now that you have created the token, you need to create a GitHub Secret with its value, by first accessing `/settings/secrets` in your repository, then adding a new secret named `ECOSYSTEM_CI_TOKEN`
 where you simply paste the contents of the token and save by clicking on `Add token`.
+
+=== What if I need to a custom setup?
+
+You can execute a custom script as part of the Ecosystem CI initialization (i.e. before the build of your repository starts)
+by adding an executable bash script `.github/ci-init.sh` to your repository.
 
 == How come this works?
 
