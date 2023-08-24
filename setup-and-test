@@ -99,6 +99,13 @@ if .github/ci-prerequisites.sh ; then
   echo "Prerequisites script done"
 fi
 
+# check custom init
+if [ -f .github/ci-init.sh ]; then
+  if .github/ci-init.sh ; then
+    echo "Custom init script done"
+  fi
+fi
+
 # check the test script
 if [ -f .github/quarkus-ecosystem-test ]; then
     echo "Test script found"
