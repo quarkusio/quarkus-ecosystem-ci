@@ -68,7 +68,7 @@ source ~/.sdkman/bin/sdkman-init.sh
 sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/config
 
 echo "Installing jbang"
-sdk install jbang 0.50.1
+sdk install jbang 0.110.1
 
 
 echo "Building Quarkus"
