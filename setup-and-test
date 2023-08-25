@@ -101,7 +101,7 @@ fi
 
 # check custom init
 if [ -f .github/ci-init.sh ]; then
-  if .github/ci-init.sh ; then
+  if QUARKUS_VERSION=${QUARKUS_VERSION} .github/ci-init.sh ; then
     echo "Custom init script done"
   fi
 fi
