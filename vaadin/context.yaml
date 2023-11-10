@@ -1,10 +1,10 @@
-timestamp: 2023-11-09_05-11-21
+timestamp: 2023-11-10_05-43-06
 issues:
   latestCommit: "108"
   repo: vaadin/quarkus
 quarkus:
   version: 999-SNAPSHOT
-  sha: 86461149ae4b55a94922670f3c703d30fe7c995a
+  sha: 9161ff7f34d798d6c253ec1ede54e33e810d5889
 alternatives:
   2.x:
     issue: 109
