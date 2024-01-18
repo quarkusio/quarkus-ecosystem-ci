@@ -72,7 +72,7 @@ sdk install jbang 0.110.1
 
 
 echo "Building Quarkus"
-if ./mvnw -B clean install -DskipTests -DskipITs -DskipDocs -Prelocations ; then
+if ./mvnw -B clean install -Dquickly -Prelocations ; then
   echo "Quarkus built successfully"
 else
   echo "Failed to build Quarkus"
