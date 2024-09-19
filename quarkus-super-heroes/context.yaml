@@ -6,4 +6,6 @@ quarkus:
   version: 999-SNAPSHOT
   sha: 1c8464b3ff87a75857bc1a8a9f0e8a72db584d58
 alternatives:
-  null
+  3.14.x:
+    issue: "23612"
+    quarkusBranch: "3.15"
