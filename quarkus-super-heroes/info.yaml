@@ -2,3 +2,7 @@ url: https://github.com/quarkusio/quarkus-super-heroes
 issues:
   repo: quarkusio/quarkus
   latestCommit: 23612
+alternatives:
+  3.14.x:
+    issue: "23612"
+    quarkusBranch: "3.15"
