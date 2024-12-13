@@ -1,0 +1,78 @@
+#! /bin/bash
+
+if [ $# -ne 2 ]; then
+  echo "Usage: ./run-for-member <member-name> <quarkus-sha>"
+  exit 1
+fi
+
+MEMBER=$1
+QUARKUS_SHA=$2
+
+pushd "$MEMBER" > /dev/null
+
+URL=$(yq e '.url' info.yaml)
+REPOSITORY=$(echo "${URL/https:\/\/github.com\//}")
+echo "Attempting to launch CI for ${REPOSITORY}"
+
+# read static information from info.yaml
+LATEST_COMMIT_ISSUE_NUM=$(yq e '.issues.latestCommit' info.yaml)
+ISSUE_REPO=$(yq e '.issues.repo' info.yaml)
+
+# here is where we will write all context information
+touch context.yaml
+
+yq e ".timestamp = \"$(date +'%Y-%m-%d_%H-%M-%S')\"" context.yaml -i
+yq e ".issues.latestCommit = \"${LATEST_COMMIT_ISSUE_NUM}\"" context.yaml -i
+yq e ".issues.repo = \"${ISSUE_REPO}\"" context.yaml -i
+yq e ".quarkus.version = \"999-SNAPSHOT\"" context.yaml -i
+yq e ".quarkus.sha = \"${QUARKUS_SHA}\"" context.yaml -i
+
+# delete previous alternatives
+yq e 'del(.alternatives)' context.yaml -i
+# if alternatives is set in info.yaml, then copy it to context.yaml
+alts=$(yq e '.alternatives' info.yaml)
+if [ -n "${alts}" ]; then
+  echo "alternatives:" >> context.yaml
+  list=$(yq e '.alternatives' info.yaml)
+  while IFS= read -r line; do
+    echo "  $line" >> context.yaml
+  done <<< "$alts"
+fi
+
+# commit changes
+git config --local user.email "quarkusbot@xam.dk"
+git config --local user.name "Quarkus Bot"
+git add .
+git commit --quiet -am "[ci skip] Commit context for ${REPOSITORY}"
+git push --quiet
+echo "Commited context changes for ${REPOSITORY}"
+
+# check if repository has been starred
+STARRED_HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --request GET --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
+if [[ ${STARRED_HTTP_CODE} != 204 ]] && [[ ${STARRED_HTTP_CODE} != 404 ]]; then
+  echo "Unexpected http response status (${STARRED_HTTP_CODE}) received when checking star status"
+  exit 1
+fi
+
+# we need to unstar the repo so we can star it again in order for the trigger to work
+if [[ ${STARRED_HTTP_CODE} = 204 ]]; then
+  echo "Repository ${REPOSITORY} has already been starred, so we first need to unstar it"
+  CHANGE_STAR_STATUS_HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --request DELETE --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
+  if [[ ${CHANGE_STAR_STATUS_HTTP_CODE} != 204 ]]; then
+    echo "Unexpected http response status (${CHANGE_STAR_STATUS_HTTP_CODE}) received when unstarring repository ${REPOSITORY}"
+    exit 1
+  fi
+  sleep 5
+fi
+
+# star the repository
+CHANGE_STAR_STATUS_HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --request PUT --url https://api.github.com/user/starred/${REPOSITORY} --header 'authorization: Bearer ${{ secrets.ECOSYSTEM_CI_TOKEN }}')
+if [[ ${CHANGE_STAR_STATUS_HTTP_CODE} != 204 ]]; then
+  echo "Unexpected http response status (${CHANGE_STAR_STATUS_HTTP_CODE}) received when starring repository ${REPOSITORY}"
+  exit 1
+fi
+
+echo "Launched CI for ${REPOSITORY}. Please check https://github.com/${REPOSITORY}/actions to see the results"
+echo ""
+
+popd > /dev/null
