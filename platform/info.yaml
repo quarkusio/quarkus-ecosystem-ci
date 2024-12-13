@@ -2,3 +2,7 @@ url: https://github.com/quarkusio/quarkus-platform
 issues:
   repo: quarkusio/quarkus
   latestCommit: 8593
+alternatives:
+  3.15:
+    issue: 45119
+    quarkusBranch: "3.15"
