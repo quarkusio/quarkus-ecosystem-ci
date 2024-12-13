@@ -29,5 +29,7 @@ jobs:
           QUARKUS_SHA=$(git ls-remote https://github.com/quarkusio/quarkus main | awk '{print $1;}')
 
           for member in */ ; do
-              ./run-for-member "${member}" "${QUARKUS_SHA}"
+              ./run-for-member "${member}" "${QUARKUS_SHA}" "${ECOSYSTEM_CI_TOKEN}"
           done
+        env:
+          ECOSYSTEM_CI_TOKEN: ${{ secrets.ECOSYSTEM_CI_TOKEN }}
