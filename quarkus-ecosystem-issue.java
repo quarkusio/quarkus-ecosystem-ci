@@ -1,38 +1,38 @@
-/*
- * Copyright 2020 Red Hat, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 //usr/bin/env jbang "$0" "$@" ; exit $?
 
 //DEPS org.kohsuke:github-api:1.326
 //DEPS info.picocli:picocli:4.7.6
+//DEPS com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2
+//DEPS com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2
 
 import org.kohsuke.github.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.TimeUnit;
+import java.time.Instant;
+import java.util.regex.Pattern;
 
 @Command(name = "report", mixinStandardHelpOptions = true,
 		description = "Takes care of updating an issue depending on the status of the build")
 class Report implements Runnable {
+
+	private static final String STATUS_MARKER = "<!-- status.quarkus.io/status:";
+	private static final String END_OF_MARKER = "-->";
+	private static final Pattern STATUS_PATTERN = Pattern.compile(STATUS_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
+
+	static {
+		OBJECT_MAPPER.registerModule(new JavaTimeModule());
+	}
 
 	@Option(names = "token", description = "Github token to use when calling the Github API")
 	private String token;
@@ -49,8 +49,8 @@ class Report implements Runnable {
 	@Option(names = "thisRepo", description = "The repository for which we are reporting the CI status")
 	private String thisRepo;
 
-	@Option(names = "runId", description = "The ID of the Github Action run for  which we are reporting the CI status")
-	private String runId;
+	@Option(names = "runId", description = "The ID of the Github Action run for which we are reporting the CI status")
+	private Long runId;
 
 	@Override
 	public void run() {
@@ -94,6 +94,8 @@ class Report implements Runnable {
 					System.out.println(String.format("Comment added on issue %s - %s, the issue has been re-opened", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 				}
 			}
+
+			issue.setBody(appendStatusInformation(issue.getBody(), new Status(Instant.now(), !succeed, thisRepo, runId)));
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -108,4 +110,20 @@ class Report implements Runnable {
 		int exitCode = new CommandLine(new Report()).execute(args);
 		System.exit(exitCode);
 	}
+
+	public String appendStatusInformation(String body, Status status) {
+		try {
+			String descriptor = STATUS_MARKER + "\n" + OBJECT_MAPPER.writeValueAsString(status) + END_OF_MARKER;
+
+			if (!body.contains(STATUS_MARKER)) {
+				return body + "\n\n" + descriptor;
+			}
+
+			return STATUS_PATTERN.matcher(body).replaceFirst(descriptor);
+		} catch (Exception e) {
+			throw new IllegalStateException("Unable to update the status descriptor", e);
+		}
+	}
+
+	public record Status(Instant updatedAt, boolean failure, String repository, Long runId) {};
 }
