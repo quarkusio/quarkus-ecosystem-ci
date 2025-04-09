@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -x -e
 
 cd ecosystem-ci/${ECOSYSTEM_CI_REPO_PATH}
 # if an alternative is not specified, then we just read the global info
