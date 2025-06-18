@@ -1,9 +1,9 @@
-timestamp: 2025-06-17_01-34-07
+timestamp: 2025-06-18_01-33-53
 issues:
   latestCommit: "11563"
   repo: quarkusio/quarkus
 quarkus:
   version: 999-SNAPSHOT
-  sha: 7e64426809af1da2432efea2116a2cf51f0cb425
+  sha: 66aefab05c03483f981cbc38bc38f2a4da6b6ffe
 alternatives:
   null
