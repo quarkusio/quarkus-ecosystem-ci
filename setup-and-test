@@ -60,15 +60,12 @@ fi
 echo "Quarkus Version is: ${QUARKUS_VERSION}"
 
 echo "Installing SDKMAN"
-sudo apt-get update -o Dir::Etc::sourcelist="sources.list" \
-  -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
-sudo apt-get install -y gnupg2 gnupg-agent
 curl -s "https://get.sdkman.io" | bash
 source ~/.sdkman/bin/sdkman-init.sh
 sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/config
 
 echo "Installing jbang"
-sdk install jbang 0.110.1
+sdk install jbang
 
 
 echo "Building Quarkus"
