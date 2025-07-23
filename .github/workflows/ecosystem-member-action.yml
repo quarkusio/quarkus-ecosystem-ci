@@ -13,11 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     name: "Invoke CI"
     steps:
-      - name: Install yq
-        uses: dcarbone/install-yq-action@v1.0.1
-
       - name: Checkout Ecosystem
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.GITHUB_REPOSITORY }}
           path: ecosystem-ci
