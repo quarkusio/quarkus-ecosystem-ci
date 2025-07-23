@@ -1,7 +1,7 @@
-timestamp: 2025-04-08_12-06-52
+timestamp: 2025-07-23_15-41-05
 issues:
   latestCommit: ""
   repo: ""
 quarkus:
   version: 999-SNAPSHOT
-  sha: 83929f7925db83f774153ee1f450e1736e6ff1bd
+  sha: c4f766a180f237d4d979b29a1cfaddde2c0f4e8b
