@@ -18,6 +18,7 @@ import picocli.CommandLine.Option;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Instant;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Command(name = "report", mixinStandardHelpOptions = true,
@@ -52,6 +53,12 @@ class Report implements Runnable {
 	@Option(names = "runId", description = "The ID of the Github Action run for which we are reporting the CI status")
 	private Long runId;
 
+	@Option(names = "quarkusSha", description = "The Git sha of the Quarkus build")
+	private String quarkusSha;
+
+	@Option(names = "projectSha", description = "The Git sha of the current project under test")
+	private String projectSha;
+
 	@Override
 	public void run() {
 		try {
@@ -75,8 +82,19 @@ class Report implements Runnable {
 				System.out.println(String.format("The issue is currently %s", issue.getState().toString()));
 			}
 
+			Status existingStatus = extractStatus(issue.getBody());
+			State newState = new State(Instant.now(), quarkusSha, projectSha);
+
+			final State firstFailure;
+			final State lastFailure;
+			final State lastSuccess;
+
 			if (succeed) {
-				if (issue != null  && isOpen(issue)) {
+				firstFailure = null;
+				lastFailure = null;
+				lastSuccess = newState;
+
+				if (isOpen(issue)) {
 					// close issue with a comment
 					final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
 					issue.close();
@@ -84,18 +102,37 @@ class Report implements Runnable {
 				} else {
 					System.out.println("Nothing to do - the build passed and the issue is already closed");
 				}
-			} else  {
+			} else {
+				lastSuccess = State.KEEP_EXISTING;
+				lastFailure = newState;
+
 				if (isOpen(issue)) {
 					final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
 					System.out.println(String.format("Comment added on issue %s - %s", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+
+					// for old reports, we won't have the first failure previously set so let's set it to the new state as an approximation
+					firstFailure = existingStatus.firstFailure() != null ? State.KEEP_EXISTING : newState;
 				} else {
 					issue.reopen();
 					final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
 					System.out.println(String.format("Comment added on issue %s - %s, the issue has been re-opened", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
+
+					firstFailure = newState;
 				}
 			}
 
-			issue.setBody(appendStatusInformation(issue.getBody(), new Status(Instant.now(), !succeed, thisRepo, runId)));
+			Status newStatus;
+			if (existingStatus != null) {
+				newStatus = new Status(Instant.now(), !succeed, thisRepo, runId, quarkusSha, projectSha,
+						firstFailure == State.KEEP_EXISTING ? existingStatus.firstFailure() : firstFailure,
+						lastFailure == State.KEEP_EXISTING ? existingStatus.lastFailure() : lastFailure,
+						lastSuccess == State.KEEP_EXISTING ? existingStatus.lastSuccess() : lastSuccess);
+			} else {
+				newStatus = new Status(Instant.now(), !succeed, thisRepo, runId, quarkusSha, projectSha,
+						firstFailure, lastFailure, lastSuccess);
+			}
+
+			issue.setBody(appendStatusInformation(issue.getBody(), newStatus));
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -125,5 +162,33 @@ class Report implements Runnable {
 		}
 	}
 
-	public record Status(Instant updatedAt, boolean failure, String repository, Long runId) {};
+	public Status extractStatus(String body) {
+		if (body == null || body.isBlank()) {
+			return null;
+		}
+
+		Matcher matcher = STATUS_PATTERN.matcher(body);
+		if (!matcher.find()) {
+			return null;
+		}
+
+		try {
+			return OBJECT_MAPPER.readValue(matcher.group(1), Status.class);
+		} catch (Exception e) {
+			System.out.println("Warning: unable to extract Status from issue body: " + e.getMessage());
+			return null;
+		}
+	}
+
+	public record Status(Instant updatedAt, boolean failure, String repository, Long runId,
+		String quarkusSha, String projectSha, State firstFailure, State lastFailure, State lastSuccess) {
+    }
+
+	public record State(Instant date, String quarkusSha, String projectSha) {
+
+		/**
+		 * Sentinel value to keep the existing value.
+		 */
+		private static final State KEEP_EXISTING = new State(null, null, null);
+	}
 }

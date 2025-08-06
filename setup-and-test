@@ -52,6 +52,7 @@ else
   cd quarkus
 fi
 
+QUARKUS_SHA=$(git rev-parse HEAD)
 if [[ -z "${QUARKUS_VERSION}" ]]; then
   # Alternatives may run against a different Quarkus version, so we need to evaluate that
   QUARKUS_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
@@ -73,7 +74,7 @@ if ./mvnw -B clean install -Dquickly -Prelocations ; then
   echo "Quarkus built successfully"
 else
   echo "Failed to build Quarkus"
-  jbang ../ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}"
+  jbang ../ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}"
   exit 1
 fi
 
@@ -83,6 +84,7 @@ cd - > /dev/null
 rm -rf quarkus
 
 cd current-repo
+PROJECT_SHA=$(git rev-parse HEAD)
 
 # check prerequisites script
 if [ -f .github/ci-prerequisites.sh ]; then
@@ -138,7 +140,7 @@ fi
 
 echo "Attempting to report results"
 
-jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}"
+jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}" projectSha="${PROJECT_SHA}"
 
 echo "Report completed"
 
