@@ -2,12 +2,15 @@
 
 //DEPS org.kohsuke:github-api:1.326
 //DEPS info.picocli:picocli:4.7.6
-//DEPS com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2
-//DEPS com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2
+//DEPS com.fasterxml.jackson:jackson-bom:2.19.2@pom
+//DEPS com.fasterxml.jackson.core:jackson-databind
+//DEPS com.fasterxml.jackson.datatype:jackson-datatype-jsr310
+//DEPS com.fasterxml.jackson.dataformat:jackson-dataformat-yaml
 
 import org.kohsuke.github.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -33,6 +36,7 @@ class Report implements Runnable {
 
 	static {
 		OBJECT_MAPPER.registerModule(new JavaTimeModule());
+		OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 	}
 
 	@Option(names = "token", description = "Github token to use when calling the Github API")
