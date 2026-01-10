@@ -44,13 +44,26 @@ issues:
 +
 An example of the above configuration can be found https://github.com/quarkusio/quarkus-ecosystem-ci/blob/419a6c18312ac26ab0213ae1bf0ee6d38a550f4e/qpid/info.yaml[here].
 
-=== What if my repository is not in the Quarkiverse organization?
+== What if my repository is not in the Quarkiverse organization?
 
-The following steps are only needed if your project is NOT a Quarkiverse participant (i.e. not a project of the https://github.com/quarkiverse[Quarkiverse] organization), as Quarkiverse projects are already set up this way:
+The following *additional* steps are only needed if your project is *NOT* a Quarkiverse participant (i.e. not a project of the https://github.com/quarkiverse[Quarkiverse] organization), as Quarkiverse projects are already set up this way:
 
-- Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used in order to open and close the issue from the CI action.
+1. ECOSYSTEM_CI_TOKEN Secret
++
+Add a secret named `ECOSYSTEM_CI_TOKEN` in your repository that contains the token of the user that opened the issue mentioned in the first step. This token will be used in order to open and close the issue from the CI action.
++
+In case you haven't created a GitHub token before, the process is roughly as follows.
++
+You can generate a token by accessing https://github.com/settings/tokens and clicking on `Generate new token`. On the page that comes up,
+provide a name,  select `repo` scope and click on `Generate token` at the bottom of the page. You will be prompted with the newly generated token, but be sure to copy it wherever
+it is needed, because you won't be able to see it again.
++
+Now that you have created the token, you need to create a GitHub Secret with its value, by first accessing `/settings/secrets` in your repository, then adding a new secret named `ECOSYSTEM_CI_TOKEN`
+where you simply paste the contents of the token and save by clicking on `Add token`.
 
-- Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
+2. Configure Github Actions
++
+Add the following file to configure the Quarkus CI in GitHub Actions for your repository:
 +
 `.github/workflows/quarkus-snapshot.yaml` (this file contains the actual GitHub Actions declaration)
 +
@@ -123,20 +136,10 @@ jobs:
           ECOSYSTEM_CI_TOKEN: ${{ secrets.ECOSYSTEM_CI_TOKEN }}
 ----
 
+
 Finally, if your extension requires a custom test script (by default `quarkus-ecosystem-test` from this repository is used), add a file named `.github/quarkus-ecosystem-test`.
 
 Example projects containing the proper GitHub Action YAML file (and which has been tested with the whole process) can be found https://github.com/geoand/quarkus-qpid-jms/blob/51a03f41c38ea43dedf05c25e2277dbf99d88d50/.github[here] and https://github.com/quarkusio/quarkus-platform/tree/main/.github[here].
-
-=== How to create a token for use with Ecosystem CI
-
-In case you haven't created a GitHub token before, the process is roughly as follows.
-
-You can generate a token by accessing https://github.com/settings/tokens and clicking on `Generate new token`. On the page that comes up,
-provide a name,  select `repo` scope and click on `Generate token` at the bottom of the page. You will be prompted with the newly generated token, but be sure to copy it wherever
-it is needed, because you won't be able to see it again.
-
-Now that you have created the token, you need to create a GitHub Secret with its value, by first accessing `/settings/secrets` in your repository, then adding a new secret named `ECOSYSTEM_CI_TOKEN`
-where you simply paste the contents of the token and save by clicking on `Add token`.
 
 === What if I need to a custom setup?
 
