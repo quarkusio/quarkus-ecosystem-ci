@@ -1,10 +1,10 @@
-timestamp: 2026-01-19_01-47-27
+timestamp: 2026-01-20_01-47-13
 issues:
   latestCommit: "23612"
   repo: quarkusio/quarkus
 quarkus:
   version: 999-SNAPSHOT
-  sha: 6161681f2be6a7540bb2df28d9aee4dbc0a3acd7
+  sha: cf05e8313cd45ba14d5e28b5587b38985c0920fd
 alternatives:
   3.14.x:
     issue: "23612"
