@@ -70,9 +70,9 @@ jobs:
             -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             clean deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
-      - name: Create ZIP
+      - name: Create tar.gz
         working-directory: /tmp/repository
-        run: zip -r ../maven-repo.zip .
+        run: tar -czf ../maven-repo.tar.gz .
       - name: Create Release
         working-directory: ${{ github.workspace }}/repository
         env:
@@ -86,4 +86,4 @@ jobs:
           gh release create "${TAG}" \
             --title "Maven Repo ${BRANCH_NAME}" \
             --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/commit/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
-            /tmp/maven-repo.zip
+            /tmp/maven-repo.tar.gz
