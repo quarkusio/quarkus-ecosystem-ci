@@ -1,0 +1,89 @@
+name: Quarkus Deploy Maven Repo
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+
+env:
+  LANG: en_US.UTF-8
+  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
+
+concurrency:
+  group: "deploy-maven-repo"
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy-maven-repo:
+    name: "Deploy Maven Repo"
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: repository
+      - uses: actions/checkout@v6
+        id: quarkus-sources
+        with:
+          path: quarkus-sources
+          repository: quarkusio/quarkus
+          ref: main
+
+      - name: Capture quarkus-sources SHA
+        id: quarkus-sources-sha
+        run: |
+          echo "quarkus_sha=$(git -C "${GITHUB_WORKSPACE}/quarkus-sources" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          CURRENT_BRANCH="main"
+          CURRENT_MONTH=$(/bin/date -u "+%Y-%m")
+          CURRENT_DAY=$(/bin/date -u "+%d")
+          ROOT_CACHE_KEY="m2-cache"
+          echo "m2-monthly-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}" >> $GITHUB_OUTPUT
+          echo "m2-monthly-branch-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}-${CURRENT_BRANCH}" >> $GITHUB_OUTPUT
+          echo "m2-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}-${CURRENT_BRANCH}-${CURRENT_DAY}" >> $GITHUB_OUTPUT
+      - name: Cache Maven Repository
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.cache-key.outputs.m2-cache-key }}
+          restore-keys: |
+            ${{ steps.cache-key.outputs.m2-monthly-branch-cache-key }}-
+            ${{ steps.cache-key.outputs.m2-monthly-cache-key }}-
+      - name: Build and Deploy
+        working-directory: ${{ github.workspace }}/quarkus-sources
+        run: |
+          ./mvnw -T0.8C -ntp -e -DskipTests -DskipITs -Dinvoker.skip \
+            -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
+            clean deploy \
+            -DaltDeploymentRepository=local::file:///tmp/repository
+      - name: Create tar.gz
+        working-directory: /tmp/repository
+        run: tar -czf ../maven-repo.tar.gz .
+      - name: Create Release
+        working-directory: ${{ github.workspace }}/repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="main"
+          TAG="maven-repo-${BRANCH_NAME}"
+          gh release delete "${TAG}" --yes || true
+          git tag -f "${TAG}"
+          git push -f origin "${TAG}"
+          gh release create "${TAG}" \
+            --title "Maven Repo ${BRANCH_NAME}" \
+            --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
+            /tmp/maven-repo.tar.gz
