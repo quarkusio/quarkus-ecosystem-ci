@@ -68,10 +68,11 @@ jobs:
         run: |
           BRANCH_NAME="main"
           TAG="maven-repo-${BRANCH_NAME}"
-          gh release delete "${TAG}" --yes || true
+          gh release delete "${TAG}" -R ${{github.repository}} --yes || true
           git tag -f "${TAG}"
           git push -f origin "${TAG}"
           gh release create "${TAG}" \
+            -R ${{github.repository}} \
             --title "Maven Repo ${BRANCH_NAME}" \
             --notes "Maven repository binaries built from \`${BRANCH_NAME}\` branch at commit ${{ github.sha }}" \
             /tmp/maven-repo.zip
