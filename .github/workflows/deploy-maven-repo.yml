@@ -10,6 +10,10 @@ env:
   LANG: en_US.UTF-8
   MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
 
+concurrency:
+  group: "deploy-maven-repo"
+  cancel-in-progress: true
+  
 defaults:
   run:
     shell: bash
