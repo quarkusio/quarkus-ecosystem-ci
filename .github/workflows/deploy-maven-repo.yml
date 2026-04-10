@@ -26,7 +26,9 @@ jobs:
       MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
+          path: /tmp/quarkus-sources
           repository: quarkusio/quarkus
           ref: main
       - name: Set up JDK 17
@@ -53,26 +55,26 @@ jobs:
             ${{ steps.cache-key.outputs.m2-monthly-branch-cache-key }}-
             ${{ steps.cache-key.outputs.m2-monthly-cache-key }}-
       - name: Build and Deploy
+        working-directory: /tmp/quarkus-sources
         run: |
           ./mvnw -T0.8C -ntp -e -DskipTests -DskipITs -Dinvoker.skip \
             -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             clean deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
       - name: Create ZIP
-        run: |
-          cd /tmp
-          zip -r maven-repo.zip repository
+        working-directory: /tmp
+        run: zip -r maven-repo.zip repository
       - name: Create Release
+        working-directory: ${{ github.workspace }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH_NAME="main"
           TAG="maven-repo-${BRANCH_NAME}"
-          gh release delete "${TAG}" -R ${{github.repository}} --yes || true
+          gh release delete "${TAG}" --yes || true
           git tag -f "${TAG}"
           git push -f origin "${TAG}"
           gh release create "${TAG}" \
-            -R ${{github.repository}} \
             --title "Maven Repo ${BRANCH_NAME}" \
             --notes "Maven repository binaries built from \`${BRANCH_NAME}\` branch at commit ${{ github.sha }}" \
             /tmp/maven-repo.zip
