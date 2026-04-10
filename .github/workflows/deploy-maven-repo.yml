@@ -79,13 +79,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH_NAME="main"
-          QUARKUS_REPO="quarkusio/quarkus"
-          QUARKUS_REF="main"
           TAG="maven-repo-${BRANCH_NAME}"
           gh release delete "${TAG}" --yes || true
           git tag -f "${TAG}"
           git push -f origin "${TAG}"
           gh release create "${TAG}" \
             --title "Maven Repo ${BRANCH_NAME}" \
-            --notes "Maven repository binaries built from ${QUARKUS_REPO} (${QUARKUS_REF}) at commit ${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}: https://github.com/${QUARKUS_REPO}/commit/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
+            --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/commit/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
             /tmp/maven-repo.zip
