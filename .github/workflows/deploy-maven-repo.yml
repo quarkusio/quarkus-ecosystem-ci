@@ -71,8 +71,8 @@ jobs:
             clean deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
       - name: Create ZIP
-        working-directory: /tmp
-        run: zip -r maven-repo.zip repository
+        working-directory: /tmp/repository
+        run: zip -r ../maven-repo.zip .
       - name: Create Release
         working-directory: ${{ github.workspace }}/repository
         env:
