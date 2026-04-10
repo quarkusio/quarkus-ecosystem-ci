@@ -50,7 +50,7 @@ jobs:
             ${{ steps.cache-key.outputs.m2-monthly-cache-key }}-
       - name: Build and Deploy
         run: |
-          ./mvnw -T0.8C -e -DskipDocs -DskipTests -DskipITs -Dinvoker.skip \
+          ./mvnw -T0.8C -ntp -e -DskipDocs -DskipTests -DskipITs -Dinvoker.skip \
             -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             clean deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
