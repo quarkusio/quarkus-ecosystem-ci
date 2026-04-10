@@ -26,9 +26,11 @@ jobs:
       MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
     steps:
       - uses: actions/checkout@v6
+        with:
+          path: repository
       - uses: actions/checkout@v6
         with:
-          path: /tmp/quarkus-sources
+          path: quarkus-sources
           repository: quarkusio/quarkus
           ref: main
       - name: Set up JDK 17
@@ -55,7 +57,7 @@ jobs:
             ${{ steps.cache-key.outputs.m2-monthly-branch-cache-key }}-
             ${{ steps.cache-key.outputs.m2-monthly-cache-key }}-
       - name: Build and Deploy
-        working-directory: /tmp/quarkus-sources
+        working-directory: ${{ github.workspace }}/quarkus-sources
         run: |
           ./mvnw -T0.8C -ntp -e -DskipTests -DskipITs -Dinvoker.skip \
             -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
@@ -65,7 +67,7 @@ jobs:
         working-directory: /tmp
         run: zip -r maven-repo.zip repository
       - name: Create Release
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ github.workspace }}/repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
