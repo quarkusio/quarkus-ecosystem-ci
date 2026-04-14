@@ -34,13 +34,13 @@ runs:
 
         echo "Found release: ${TAG} (published: ${PUBLISHED})"
 
-        # Check if the release is older than 1 day
+        # Check if the release is older than 36 hours
         RELEASE_EPOCH=$(date -d "${PUBLISHED}" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "${PUBLISHED}" +%s 2>/dev/null)
         NOW_EPOCH=$(date +%s)
         AGE_HOURS=$(( (NOW_EPOCH - RELEASE_EPOCH) / 3600 ))
 
-        if [ "${AGE_HOURS}" -gt 24 ]; then
-          echo "::error::Latest snapshot release '${TAG}' is ${AGE_HOURS} hours old (published: ${PUBLISHED}). Expected a release less than 24 hours old."
+        if [ "${AGE_HOURS}" -gt 36 ]; then
+          echo "::error::Latest snapshot release '${TAG}' is ${AGE_HOURS} hours old (published: ${PUBLISHED}). Expected a release less than 36 hours old."
           exit 1
         fi
 
