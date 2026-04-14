@@ -70,7 +70,7 @@ jobs:
         working-directory: ${{ github.workspace }}/quarkus-sources
         run: |
           ./mvnw -T0.8C -ntp -e -DskipTests -DskipITs -Dinvoker.skip \
-            -Dmaven.install.skip=true -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
+            -Dno-test-modules -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             clean deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
       - name: Create tar.gz
