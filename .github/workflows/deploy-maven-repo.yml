@@ -84,6 +84,7 @@ jobs:
           BRANCH_NAME="${{ matrix.branch }}"
           DATE=$(date -u "+%Y-%m-%d")
           TAG="maven-repo-${BRANCH_NAME}-${DATE}"
+          gh release delete "${TAG}" --yes --cleanup-tag || true
           gh release create "${TAG}" \
             --title "Maven Repo ${BRANCH_NAME} (${DATE})" \
             --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
