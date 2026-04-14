@@ -1,0 +1,68 @@
+name: Install Quarkus Snapshots
+description: Download and install Quarkus Maven snapshot artifacts from the latest release
+
+inputs:
+  branch:
+    description: The Quarkus branch to install snapshots for
+    required: true
+    default: main
+
+runs:
+  using: composite
+  steps:
+    - name: Install Quarkus Snapshots
+      shell: bash
+      run: |
+        BRANCH="${{ inputs.branch }}"
+        PREFIX="maven-repo-${BRANCH}-"
+
+        echo "Looking for latest Quarkus snapshot release for branch: ${BRANCH}"
+
+        # Find the latest release matching this branch
+        RELEASE_INFO=$(gh release list --limit 20 \
+          --repo "${{ github.repository }}" \
+          | grep "${PREFIX}" \
+          | head -n 1)
+
+        if [ -z "${RELEASE_INFO}" ]; then
+          echo "::error::No snapshot release found for branch '${BRANCH}'"
+          exit 1
+        fi
+
+        TAG=$(echo "${RELEASE_INFO}" | awk -F'\t' '{print $3}')
+        PUBLISHED=$(echo "${RELEASE_INFO}" | awk -F'\t' '{print $4}')
+
+        echo "Found release: ${TAG} (published: ${PUBLISHED})"
+
+        # Check if the release is older than 1 day
+        RELEASE_EPOCH=$(date -d "${PUBLISHED}" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "${PUBLISHED}" +%s 2>/dev/null)
+        NOW_EPOCH=$(date +%s)
+        AGE_HOURS=$(( (NOW_EPOCH - RELEASE_EPOCH) / 3600 ))
+
+        if [ "${AGE_HOURS}" -gt 24 ]; then
+          echo "::error::Latest snapshot release '${TAG}' is ${AGE_HOURS} hours old (published: ${PUBLISHED}). Expected a release less than 24 hours old."
+          exit 1
+        fi
+
+        # Log release details
+        RELEASE_URL=$(gh release view "${TAG}" --repo "${{ github.repository }}" --json url --jq '.url')
+        RELEASE_NOTES=$(gh release view "${TAG}" --repo "${{ github.repository }}" --json body --jq '.body')
+        echo "Release URL: ${RELEASE_URL}"
+        echo "Release notes: ${RELEASE_NOTES}"
+        echo "Release age: ${AGE_HOURS} hours"
+
+        # Download and install into .m2
+        echo "Downloading maven-repo.tar.gz..."
+        gh release download "${TAG}" \
+          --repo "${{ github.repository }}" \
+          --pattern "maven-repo.tar.gz" \
+          --dir /tmp
+
+        echo "Installing into ~/.m2/repository..."
+        mkdir -p ~/.m2/repository
+        tar -xzf /tmp/maven-repo.tar.gz -C ~/.m2/repository
+
+        echo "Quarkus snapshots for branch '${BRANCH}' installed successfully."
+        rm -f /tmp/maven-repo.tar.gz
+      env:
+        GH_TOKEN: ${{ github.token }}

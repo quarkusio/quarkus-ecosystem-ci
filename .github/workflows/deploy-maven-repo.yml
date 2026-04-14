@@ -20,8 +20,11 @@ defaults:
 
 jobs:
   deploy-maven-repo:
-    name: "Deploy Maven Repo"
+    name: "Deploy Maven Repo - ${{ matrix.branch }}"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [main]
     env:
       MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
     steps:
@@ -33,7 +36,7 @@ jobs:
         with:
           path: quarkus-sources
           repository: quarkusio/quarkus
-          ref: main
+          ref: ${{ matrix.branch }}
 
       - name: Capture quarkus-sources SHA
         id: quarkus-sources-sha
@@ -48,7 +51,7 @@ jobs:
       - name: Generate cache key
         id: cache-key
         run: |
-          CURRENT_BRANCH="main"
+          CURRENT_BRANCH="${{ matrix.branch }}"
           CURRENT_MONTH=$(/bin/date -u "+%Y-%m")
           CURRENT_DAY=$(/bin/date -u "+%d")
           ROOT_CACHE_KEY="m2-cache"
@@ -67,7 +70,7 @@ jobs:
         working-directory: ${{ github.workspace }}/quarkus-sources
         run: |
           ./mvnw -T0.8C -ntp -e -DskipTests -DskipITs -Dinvoker.skip \
-            -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
+            -Dmaven.install.skip=true -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             clean deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
       - name: Create tar.gz
@@ -78,12 +81,25 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH_NAME="main"
-          TAG="maven-repo-${BRANCH_NAME}"
-          gh release delete "${TAG}" --yes || true
-          git tag -f "${TAG}"
-          git push -f origin "${TAG}"
+          BRANCH_NAME="${{ matrix.branch }}"
+          DATE=$(date -u "+%Y-%m-%d")
+          TAG="maven-repo-${BRANCH_NAME}-${DATE}"
           gh release create "${TAG}" \
-            --title "Maven Repo ${BRANCH_NAME}" \
+            --title "Maven Repo ${BRANCH_NAME} (${DATE})" \
             --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
             /tmp/maven-repo.tar.gz
+      - name: Cleanup old releases
+        working-directory: ${{ github.workspace }}/repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="${{ matrix.branch }}"
+          PREFIX="maven-repo-${BRANCH_NAME}-"
+          # List releases matching this branch, sorted by date (newest first), skip the 5 most recent
+          gh release list --limit 100 \
+            | grep "${PREFIX}" \
+            | tail -n +6 \
+            | while IFS=$'\t' read -r _ _ TAG _; do
+                echo "Deleting old release: ${TAG}"
+                gh release delete "${TAG}" --yes --cleanup-tag
+              done
