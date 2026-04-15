@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -x -e
+
+QUARKUS_SNAPSHOT_BRANCH="${1:-main}"
+QUARKUS_SNAPSHOT_REPO="quarkusio/quarkus-ecosystem-ci"
+PREFIX="maven-repo-${QUARKUS_SNAPSHOT_BRANCH}-"
+
+echo "Installing SDKMAN"
+curl -s "https://get.sdkman.io" | bash
+source ~/.sdkman/bin/sdkman-init.sh
+sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/config
+
+echo "Installing jbang"
+sdk install jbang 0.126.3
+
+report_failure() {
+  echo "Failed to install Quarkus snapshot"
+  jbang ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}"
+  exit 1
+}
+
+echo "Looking for latest Quarkus snapshot release for branch: ${QUARKUS_SNAPSHOT_BRANCH}"
+
+RELEASE_INFO=$(gh release list --limit 20 \
+  --repo "${QUARKUS_SNAPSHOT_REPO}" \
+  | grep "${PREFIX}" \
+  | head -n 1)
+
+if [ -z "${RELEASE_INFO}" ]; then
+  echo "No snapshot release found for branch '${QUARKUS_SNAPSHOT_BRANCH}'"
+  report_failure
+fi
+
+TAG=$(echo "${RELEASE_INFO}" | awk -F'\t' '{print $3}')
+PUBLISHED=$(echo "${RELEASE_INFO}" | awk -F'\t' '{print $4}')
+
+echo "Found release: ${TAG} (published: ${PUBLISHED})"
+
+# Check if the release is older than 36 hours
+RELEASE_EPOCH=$(date -d "${PUBLISHED}" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "${PUBLISHED}" +%s 2>/dev/null)
+NOW_EPOCH=$(date +%s)
+AGE_HOURS=$(( (NOW_EPOCH - RELEASE_EPOCH) / 3600 ))
+
+if [ "${AGE_HOURS}" -gt 36 ]; then
+  echo "Latest snapshot release '${TAG}' is ${AGE_HOURS} hours old (published: ${PUBLISHED}). Expected a release less than 36 hours old."
+  report_failure
+fi
+
+echo "Downloading Quarkus snapshot: ${TAG} (age: ${AGE_HOURS} hours)"
+if ! gh release download "${TAG}" \
+  --repo "${QUARKUS_SNAPSHOT_REPO}" \
+  --pattern "maven-repo.tar.gz" \
+  --dir /tmp; then
+  report_failure
+fi
+
+mkdir -p ~/.m2/repository
+tar -xzf /tmp/maven-repo.tar.gz -C ~/.m2/repository
+rm -f /tmp/maven-repo.tar.gz
+
+echo "Quarkus snapshots for branch '${QUARKUS_SNAPSHOT_BRANCH}' installed successfully."

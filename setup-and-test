@@ -7,23 +7,6 @@ if [[ -z "${ALTERNATIVE}" ]]; then
   ISSUE_NUM=$(yq e '.issues.latestCommit' ${ECOSYSTEM_CI_REPO_FILE})
   QUARKUS_SHA=$(yq e '.quarkus.sha' ${ECOSYSTEM_CI_REPO_FILE})
   QUARKUS_VERSION=$(yq e '.quarkus.version' ${ECOSYSTEM_CI_REPO_FILE})
-
-  # Detect if Quarkus 2.x is used and point to the correct branch
-  REPO_PATH=../../current-repo
-  POM_PROPERTY=quarkus.version
-
-  if [[ ! -z "${QUARKUS_VERSION_POM_PATH}" ]]; then
-    REPO_PATH="${REPO_PATH}/${QUARKUS_VERSION_POM_PATH}"
-  fi
-
-  if [[ ! -z "${QUARKUS_VERSION_POM_PROPERTY}" ]]; then
-    POM_PROPERTY=${QUARKUS_VERSION_POM_PROPERTY}
-  fi
-
-  if [[ "$(mvn help:evaluate -Dexpression=${POM_PROPERTY} -q -DforceStdout -f ${REPO_PATH}/pom.xml| cut -d. -f1)" = "2" ]]; then
-      QUARKUS_BRANCH="2.16"
-      QUARKUS_VERSION="2.16.999-SNAPSHOT"
-  fi
 else
   # Check if the alternative exists
   if [[ "$(yq e '.alternatives|has(env(ALTERNATIVE))' ${ECOSYSTEM_CI_REPO_FILE})" ]] ; then
@@ -39,49 +22,16 @@ fi
 ISSUE_REPO=$(yq e '.issues.repo' ${ECOSYSTEM_CI_REPO_FILE})
 cd - > /dev/null
 
-# Checkout Quarkus
-if [[ -z "${QUARKUS_BRANCH}" ]]; then
-  # a depth of 1 should be fine because this runs almost as soon as the original value of QUARKUS_SHA was created,
-  # but lets be on the safe side by pulling in some more history
-  git clone --depth=20 --branch main https://github.com/quarkusio/quarkus.git
-  cd quarkus
-  git checkout ${QUARKUS_SHA}
-else
-  # if a branch was specified, then just check that out
-  git clone --depth=1 --branch ${QUARKUS_BRANCH} https://github.com/quarkusio/quarkus.git
-  cd quarkus
-fi
+# Export variables needed by setup-quarkus for failure reporting
+export ISSUE_REPO ISSUE_NUM QUARKUS_SHA
 
-QUARKUS_SHA=$(git rev-parse HEAD)
-if [[ -z "${QUARKUS_VERSION}" ]]; then
-  # Alternatives may run against a different Quarkus version, so we need to evaluate that
-  QUARKUS_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
-fi
+# Install Quarkus snapshot from pre-built release
+ecosystem-ci/setup-quarkus "${QUARKUS_BRANCH:-main}"
+
+# Source SDKMAN so jbang is available for the rest of the script
+source ~/.sdkman/bin/sdkman-init.sh
 
 echo "Quarkus Version is: ${QUARKUS_VERSION}"
-
-echo "Installing SDKMAN"
-curl -s "https://get.sdkman.io" | bash
-source ~/.sdkman/bin/sdkman-init.sh
-sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/config
-
-echo "Installing jbang"
-sdk install jbang 0.126.3
-
-
-echo "Building Quarkus"
-if ./mvnw -B clean install -Dquickly -Prelocations -Dno-test-modules; then
-  echo "Quarkus built successfully"
-else
-  echo "Failed to build Quarkus"
-  jbang ../ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}"
-  exit 1
-fi
-
-cd - > /dev/null
-
-# delete the quarkus repository in order to allow multiple consecutive executions of this script
-rm -rf quarkus
 
 cd current-repo
 PROJECT_SHA=$(git rev-parse HEAD)
