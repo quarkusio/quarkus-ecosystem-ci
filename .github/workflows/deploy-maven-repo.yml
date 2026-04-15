@@ -1,0 +1,122 @@
+name: Quarkus Deploy Maven Repo
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * 1-5'
+
+env:
+  LANG: en_US.UTF-8
+  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
+
+concurrency:
+  group: "deploy-maven-repo"
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy-maven-repo:
+    name: "Deploy Maven Repo - ${{ matrix.branch }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [main]
+    env:
+      MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: repository
+      - uses: actions/checkout@v6
+        id: quarkus-sources
+        with:
+          path: quarkus-sources
+          repository: quarkusio/quarkus
+          ref: ${{ matrix.branch }}
+          fetch-depth: 1
+
+      - name: Capture quarkus-sources SHA
+        id: quarkus-sources-sha
+        run: |
+          echo "quarkus_sha=$(git -C "${GITHUB_WORKSPACE}/quarkus-sources" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          CURRENT_BRANCH="${{ matrix.branch }}"
+          CURRENT_MONTH=$(/bin/date -u "+%Y-%m")
+          CURRENT_DAY=$(/bin/date -u "+%d")
+          ROOT_CACHE_KEY="m2-cache"
+          echo "m2-monthly-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}" >> $GITHUB_OUTPUT
+          echo "m2-monthly-branch-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}-${CURRENT_BRANCH}" >> $GITHUB_OUTPUT
+          echo "m2-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}-${CURRENT_BRANCH}-${CURRENT_DAY}" >> $GITHUB_OUTPUT
+      - name: Cache Maven Repository
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.cache-key.outputs.m2-cache-key }}
+          restore-keys: |
+            ${{ steps.cache-key.outputs.m2-monthly-branch-cache-key }}-
+            ${{ steps.cache-key.outputs.m2-monthly-cache-key }}-
+      - name: Build and Deploy
+        working-directory: ${{ github.workspace }}/quarkus-sources
+        run: |
+          ./mvnw -T0.8C -ntp -e -DskipTests -DskipITs -Dinvoker.skip \
+            -Dno-test-modules -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
+            deploy \
+            -DaltDeploymentRepository=local::file:///tmp/repository
+      - name: Delete snapshots artifacts from cache
+        run: find ~/.m2 -name \*-SNAPSHOT -type d -exec rm -rf {} +
+      - name: Convert to installed format
+        run: |
+          # Rename timestamped snapshots (e.g. foo-999-20260415.102002-1.jar) to SNAPSHOT format (foo-999-SNAPSHOT.jar)
+          find /tmp/repository -type f | while read -r file; do
+            newfile=$(echo "$file" | sed 's/[0-9]\{8\}\.[0-9]\{6\}-[0-9]\{1,\}/SNAPSHOT/g')
+            if [ "$file" != "$newfile" ]; then
+              mv "$file" "$newfile"
+            fi
+          done
+          # Remove maven-metadata files that reference timestamped versions
+          find /tmp/repository -name 'maven-metadata*' -delete
+      - name: Create tar.gz
+        working-directory: /tmp/repository
+        run: tar -czf ../maven-repo.tar.gz .
+      - name: Create Release
+        working-directory: ${{ github.workspace }}/repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="${{ matrix.branch }}"
+          DATE=$(date -u "+%Y-%m-%d")
+          TAG="maven-repo-${BRANCH_NAME}-${DATE}"
+          gh release delete "${TAG}" --yes --cleanup-tag || true
+          gh release create "${TAG}" \
+            --title "Maven Repo ${BRANCH_NAME} (${DATE})" \
+            --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
+            /tmp/maven-repo.tar.gz
+      - name: Cleanup old releases
+        working-directory: ${{ github.workspace }}/repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="${{ matrix.branch }}"
+          PREFIX="maven-repo-${BRANCH_NAME}-"
+          # List releases matching this branch, sorted by date (newest first), skip the 5 most recent
+          gh release list --limit 100 \
+            | grep "${PREFIX}" \
+            | tail -n +6 \
+            | while IFS=$'\t' read -r _ _ TAG _; do
+                echo "Deleting old release: ${TAG}"
+                gh release delete "${TAG}" --yes --cleanup-tag
+              done
