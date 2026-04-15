@@ -88,6 +88,9 @@ else
   TEST_STATUS="failure"
 fi
 
+echo "Deleting SNAPSHOT artifacts from local Maven repository to save space"
+find ~/.m2 -name \*-SNAPSHOT -type d -exec rm -rf {} +
+
 echo "Attempting to report results"
 
 jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}" projectSha="${PROJECT_SHA}"
