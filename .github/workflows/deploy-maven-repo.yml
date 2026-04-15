@@ -37,6 +37,7 @@ jobs:
           path: quarkus-sources
           repository: quarkusio/quarkus
           ref: ${{ matrix.branch }}
+          fetch-depth: 1
 
       - name: Capture quarkus-sources SHA
         id: quarkus-sources-sha
