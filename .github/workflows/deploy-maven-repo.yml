@@ -5,6 +5,8 @@ permissions:
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * 1-5'
 
 env:
   LANG: en_US.UTF-8
