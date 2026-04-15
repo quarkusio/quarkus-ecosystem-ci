@@ -74,6 +74,8 @@ jobs:
             -Dno-test-modules -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
+      - name: Delete snapshots artifacts from cache
+        run: find ~/.m2 -name \*-SNAPSHOT -type d -exec rm -rf {} +
       - name: Convert to installed format
         run: |
           # Rename timestamped snapshots (e.g. foo-999-20260415.102002-1.jar) to SNAPSHOT format (foo-999-SNAPSHOT.jar)
