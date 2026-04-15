@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x -e
+set -e
 
 QUARKUS_SNAPSHOT_BRANCH="${1:-main}"
 QUARKUS_SNAPSHOT_REPO="quarkusio/quarkus-ecosystem-ci"
