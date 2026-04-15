@@ -73,6 +73,17 @@ jobs:
             -Dno-test-modules -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
+      - name: Convert to installed format
+        run: |
+          # Rename timestamped snapshots (e.g. foo-999-20260415.102002-1.jar) to SNAPSHOT format (foo-999-SNAPSHOT.jar)
+          find /tmp/repository -type f | while read -r file; do
+            newfile=$(echo "$file" | sed 's/[0-9]\{8\}\.[0-9]\{6\}-[0-9]\{1,\}/SNAPSHOT/g')
+            if [ "$file" != "$newfile" ]; then
+              mv "$file" "$newfile"
+            fi
+          done
+          # Remove maven-metadata files that reference timestamped versions
+          find /tmp/repository -name 'maven-metadata*' -delete
       - name: Create tar.gz
         working-directory: /tmp/repository
         run: tar -czf ../maven-repo.tar.gz .
