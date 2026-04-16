@@ -63,6 +63,15 @@ class Report implements Runnable {
 	@Option(names = "projectSha", description = "The Git sha of the current project under test")
 	private String projectSha;
 
+	@Option(names = "builtFromSource", description = "Whether Quarkus was built from source instead of using a pre-built snapshot")
+	private boolean builtFromSource;
+
+	@Option(names = "quarkusBranch", description = "The Quarkus branch used for the build")
+	private String quarkusBranch;
+
+	@Option(names = "quarkusVersion", description = "The Quarkus version used for the build")
+	private String quarkusVersion;
+
 	@Override
 	public void run() {
 		try {
@@ -73,6 +82,10 @@ class Report implements Runnable {
 			}
 
 			System.out.println(String.format("The CI build had status %s.", status));
+
+			final String buildNote = builtFromSource
+					? String.format("\n* **Note:** Quarkus was built from source (branch: `%s`, version: `%s`)", quarkusBranch, quarkusVersion)
+					: "";
 
 			final GitHub github = new GitHubBuilder().withOAuthToken(token).build();
 			final GHRepository repository = github.getRepository(issueRepo);
@@ -100,7 +113,7 @@ class Report implements Runnable {
 
 				if (isOpen(issue)) {
 					// close issue with a comment
-					final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
+					final GHIssueComment comment = issue.comment(String.format("Build fixed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s%s", thisRepo, runId, buildNote));
 					issue.close();
 					System.out.println(String.format("Comment added on issue %s - %s, the issue has also been closed", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 				} else {
@@ -111,14 +124,14 @@ class Report implements Runnable {
 				lastFailure = newState;
 
 				if (isOpen(issue)) {
-					final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
+					final GHIssueComment comment = issue.comment(String.format("The build is still failing:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s%s", thisRepo, runId, buildNote));
 					System.out.println(String.format("Comment added on issue %s - %s", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 
 					// for old reports, we won't have the first failure previously set so let's set it to the new state as an approximation
 					firstFailure = existingStatus.firstFailure() != null ? State.KEEP_EXISTING : newState;
 				} else {
 					issue.reopen();
-					final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s", thisRepo, runId));
+					final GHIssueComment comment = issue.comment(String.format("Unfortunately, the build failed:\n* Link to latest CI run: https://github.com/%s/actions/runs/%s%s", thisRepo, runId, buildNote));
 					System.out.println(String.format("Comment added on issue %s - %s, the issue has been re-opened", issue.getHtmlUrl().toString(), comment.getHtmlUrl().toString()));
 
 					firstFailure = newState;

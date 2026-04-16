@@ -36,6 +36,7 @@ sdk install jbang 0.126.3
 # Install Quarkus snapshot from pre-built release, fall back to building from source
 if ecosystem-ci/setup-quarkus "${QUARKUS_BRANCH:-main}"; then
   echo "Quarkus snapshot installed from pre-built release"
+  QUARKUS_BUILT_FROM_SOURCE="false"
 else
   echo "Pre-built release not available, building Quarkus from source"
 
@@ -54,12 +55,14 @@ else
     QUARKUS_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
   fi
 
+  QUARKUS_BUILT_FROM_SOURCE="true"
+
   echo "Building Quarkus"
   if ./mvnw -B clean install -Dquickly -Prelocations -Dno-test-modules; then
     echo "Quarkus built successfully"
   else
     echo "Failed to build Quarkus"
-    jbang ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}"
+    jbang ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}" builtFromSource="${QUARKUS_BUILT_FROM_SOURCE}" quarkusBranch="${QUARKUS_BRANCH:-main}" quarkusVersion="${QUARKUS_VERSION}"
     exit 1
   fi
 
@@ -129,7 +132,7 @@ find ~/.m2 -name \*-SNAPSHOT -type d -exec rm -rf {} +
 
 echo "Attempting to report results"
 
-jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}" projectSha="${PROJECT_SHA}"
+jbang .github/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="${TEST_STATUS}" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}" projectSha="${PROJECT_SHA}" builtFromSource="${QUARKUS_BUILT_FROM_SOURCE}" quarkusBranch="${QUARKUS_BRANCH:-main}" quarkusVersion="${QUARKUS_VERSION}"
 
 echo "Report completed"
 
