@@ -39,6 +39,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           path: repository
+
       - uses: actions/checkout@v6
         id: quarkus-sources
         with:
@@ -57,6 +58,7 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
+
       - name: Generate cache key
         id: cache-key
         run: |
@@ -67,6 +69,7 @@ jobs:
           echo "m2-monthly-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}" >> $GITHUB_OUTPUT
           echo "m2-monthly-branch-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}-${CURRENT_BRANCH}" >> $GITHUB_OUTPUT
           echo "m2-cache-key=${ROOT_CACHE_KEY}-${CURRENT_MONTH}-${CURRENT_BRANCH}-${CURRENT_DAY}" >> $GITHUB_OUTPUT
+
       - name: Cache Maven Repository
         uses: actions/cache@v5
         with:
@@ -75,6 +78,7 @@ jobs:
           restore-keys: |
             ${{ steps.cache-key.outputs.m2-monthly-branch-cache-key }}-
             ${{ steps.cache-key.outputs.m2-monthly-cache-key }}-
+
       - name: Build and Deploy
         working-directory: ${{ github.workspace }}/quarkus-sources
         run: |
@@ -82,8 +86,10 @@ jobs:
             -Dno-test-modules -DskipExtensionValidation -Dskip.gradle.tests -Dtruststore.skip \
             deploy \
             -DaltDeploymentRepository=local::file:///tmp/repository
+
       - name: Delete snapshots artifacts from cache
         run: find ~/.m2 -name \*-SNAPSHOT -type d -exec rm -rf {} +
+
       - name: Convert to installed format
         run: |
           # Rename timestamped snapshots (e.g. foo-999-20260415.102002-1.jar) to SNAPSHOT format (foo-999-SNAPSHOT.jar)
@@ -95,9 +101,11 @@ jobs:
           done
           # Remove maven-metadata files that reference timestamped versions
           find /tmp/repository -name 'maven-metadata*' -delete
+
       - name: Create tar.gz
         working-directory: /tmp/repository
         run: tar -czf ../maven-repo.tar.gz .
+
       - name: Create Release
         working-directory: ${{ github.workspace }}/repository
         env:
@@ -111,6 +119,7 @@ jobs:
             --title "Maven Repo ${BRANCH_NAME} (${DATE})" \
             --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
             /tmp/maven-repo.tar.gz
+
       - name: Cleanup old releases
         working-directory: ${{ github.workspace }}/repository
         env:
