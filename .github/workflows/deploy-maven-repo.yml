@@ -26,7 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [main]
+        include:
+          - branch: main
+            java-version: 17
+          - branch: 3.33
+            java-version: 17
+          - branch: 3.27
+            java-version: 17
     env:
       MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
     steps:
@@ -46,11 +52,11 @@ jobs:
         run: |
           echo "quarkus_sha=$(git -C "${GITHUB_WORKSPACE}/quarkus-sources" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: ${{ matrix.java-version }}
       - name: Generate cache key
         id: cache-key
         run: |
