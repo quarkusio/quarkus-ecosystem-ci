@@ -25,11 +25,16 @@ cd - > /dev/null
 # Export variables needed by setup-quarkus for failure reporting
 export ISSUE_REPO ISSUE_NUM QUARKUS_SHA
 
+echo "Installing SDKMAN"
+curl -s "https://get.sdkman.io" | bash
+source ~/.sdkman/bin/sdkman-init.sh
+sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/config
+
+echo "Installing jbang"
+sdk install jbang 0.126.3
+
 # Install Quarkus snapshot from pre-built release
 ecosystem-ci/setup-quarkus "${QUARKUS_BRANCH:-main}"
-
-# Source SDKMAN so jbang is available for the rest of the script
-source ~/.sdkman/bin/sdkman-init.sh
 
 echo "Quarkus Version is: ${QUARKUS_VERSION}"
 
