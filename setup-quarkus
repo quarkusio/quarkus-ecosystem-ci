@@ -7,7 +7,6 @@ PREFIX="maven-repo-${QUARKUS_SNAPSHOT_BRANCH}-"
 
 report_failure() {
   echo "Failed to install Quarkus snapshot"
-  jbang ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}"
   exit 1
 }
 

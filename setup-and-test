@@ -33,8 +33,39 @@ sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' ~/.sdkman/etc/c
 echo "Installing jbang"
 sdk install jbang 0.126.3
 
-# Install Quarkus snapshot from pre-built release
-ecosystem-ci/setup-quarkus "${QUARKUS_BRANCH:-main}"
+# Install Quarkus snapshot from pre-built release, fall back to building from source
+if ecosystem-ci/setup-quarkus "${QUARKUS_BRANCH:-main}"; then
+  echo "Quarkus snapshot installed from pre-built release"
+else
+  echo "Pre-built release not available, building Quarkus from source"
+
+  # Checkout Quarkus
+  if [[ -z "${QUARKUS_BRANCH}" ]]; then
+    git clone --depth=20 --branch main https://github.com/quarkusio/quarkus.git
+    cd quarkus
+    git checkout ${QUARKUS_SHA}
+  else
+    git clone --depth=1 --branch ${QUARKUS_BRANCH} https://github.com/quarkusio/quarkus.git
+    cd quarkus
+  fi
+
+  QUARKUS_SHA=$(git rev-parse HEAD)
+  if [[ -z "${QUARKUS_VERSION}" ]]; then
+    QUARKUS_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+  fi
+
+  echo "Building Quarkus"
+  if ./mvnw -B clean install -Dquickly -Prelocations -Dno-test-modules; then
+    echo "Quarkus built successfully"
+  else
+    echo "Failed to build Quarkus"
+    jbang ecosystem-ci/quarkus-ecosystem-issue.java token="${ECOSYSTEM_CI_TOKEN}" status="failure" issueRepo="${ISSUE_REPO}" issueNumber="${ISSUE_NUM}" thisRepo="${GITHUB_REPOSITORY}" runId="${GITHUB_RUN_ID}" quarkusSha="${QUARKUS_SHA}"
+    exit 1
+  fi
+
+  cd - > /dev/null
+  rm -rf quarkus
+fi
 
 echo "Quarkus Version is: ${QUARKUS_VERSION}"
 
