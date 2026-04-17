@@ -106,6 +106,12 @@ jobs:
         working-directory: /tmp/repository
         run: tar -czf ../maven-repo.tar.gz .
 
+      - name: Extract Quarkus version
+        id: quarkus-version
+        working-directory: ${{ github.workspace }}/quarkus-sources
+        run: |
+          echo "version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_OUTPUT"
+
       - name: Create Release
         working-directory: ${{ github.workspace }}/repository
         env:
@@ -117,7 +123,7 @@ jobs:
           gh release delete "${TAG}" --yes --cleanup-tag || true
           gh release create "${TAG}" \
             --title "Maven Repo ${BRANCH_NAME} (${DATE})" \
-            --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
+            --notes $'- Quarkus ${{ steps.quarkus-version.outputs.version }}\n - Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}' \
             /tmp/maven-repo.tar.gz
 
       - name: Cleanup old releases
