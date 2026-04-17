@@ -113,25 +113,9 @@ jobs:
         run: |
           BRANCH_NAME="${{ matrix.branch }}"
           DATE=$(date -u "+%Y-%m-%d")
-          TAG="maven-repo-${BRANCH_NAME}-${DATE}"
+          TAG="maven-repo-${BRANCH_NAME}"
           gh release delete "${TAG}" --yes --cleanup-tag || true
           gh release create "${TAG}" \
             --title "Maven Repo ${BRANCH_NAME} (${DATE})" \
             --notes "Maven repository binaries built from https://github.com/quarkusio/quarkus/tree/${{ steps.quarkus-sources-sha.outputs.quarkus_sha }}" \
             /tmp/maven-repo.tar.gz
-
-      - name: Cleanup old releases
-        working-directory: ${{ github.workspace }}/repository
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          BRANCH_NAME="${{ matrix.branch }}"
-          PREFIX="maven-repo-${BRANCH_NAME}-"
-          # List releases matching this branch, sorted by date (newest first), skip the 5 most recent
-          gh release list --limit 100 \
-            | grep "${PREFIX}" \
-            | tail -n +6 \
-            | while IFS=$'\t' read -r _ _ TAG _; do
-                echo "Deleting old release: ${TAG}"
-                gh release delete "${TAG}" --yes --cleanup-tag
-              done
