@@ -45,8 +45,11 @@ if ! gh release download "${TAG}" \
   report_failure
 fi
 
+QUARKUS_VERSION=$(tar -tzf /tmp/maven-repo.tar.gz | grep 'io/quarkus/quarkus-core/[^/]' | head -1 | sed 's|.*/quarkus-core/\([^/]*\)/.*|\1|')
+echo "QUARKUS_VERSION=${QUARKUS_VERSION}" > /tmp/quarkus-env
+
 mkdir -p ~/.m2/repository
 tar -xzf /tmp/maven-repo.tar.gz -C ~/.m2/repository
 rm -f /tmp/maven-repo.tar.gz
 
-echo "Quarkus snapshots for branch '${QUARKUS_SNAPSHOT_BRANCH}' installed successfully."
+echo "Quarkus ${QUARKUS_VERSION} for branch '${QUARKUS_SNAPSHOT_BRANCH}' installed successfully."

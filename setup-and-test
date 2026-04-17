@@ -36,6 +36,7 @@ sdk install jbang 0.126.3
 # Install Quarkus snapshot from pre-built release, fall back to building from source
 if ecosystem-ci/setup-quarkus "${QUARKUS_BRANCH:-main}"; then
   echo "Quarkus snapshot installed from pre-built release"
+  source /tmp/quarkus-env
   QUARKUS_BUILT_FROM_SOURCE="false"
 else
   echo "Pre-built release not available, building Quarkus from source"
