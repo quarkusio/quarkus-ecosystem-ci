@@ -134,11 +134,11 @@ jobs:
         run: |
           BRANCH_NAME="${{ matrix.branch }}"
           PREFIX="maven-repo-${BRANCH_NAME}-"
-          # List releases matching this branch, sorted by date (newest first), skip the 5 most recent
-          gh release list --limit 100 \
-            | grep "${PREFIX}" \
-            | tail -n +6 \
-            | while IFS=$'\t' read -r _ _ TAG _; do
+          CUTOFF=$(date -u -d '36 hours ago' +%s)
+          gh release list --limit 100 --json tagName,createdAt \
+            | jq -r --arg prefix "$PREFIX" --argjson cutoff "$CUTOFF" \
+              '.[] | select(.tagName | startswith($prefix)) | select((.createdAt | fromdateiso8601) < $cutoff) | .tagName' \
+            | while read -r TAG; do
                 echo "Deleting old release: ${TAG}"
                 gh release delete "${TAG}" --yes --cleanup-tag
               done
