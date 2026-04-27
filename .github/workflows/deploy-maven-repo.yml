@@ -136,8 +136,7 @@ jobs:
           PREFIX="maven-repo-${BRANCH_NAME}-"
           CUTOFF_DATE=$(date -u -d '36 hours ago' '+%Y-%m-%d')
           gh release list --limit 100 --json tagName \
-            | jq -r --arg prefix "$PREFIX" --arg cutoff "$CUTOFF_DATE" \
-              '.[] | select(.tagName | startswith($prefix)) | select((.tagName | ltrimstr($prefix)) < $cutoff) | .tagName' \
+            --jq ".[] | select(.tagName | startswith(\"${PREFIX}\")) | select((.tagName | ltrimstr(\"${PREFIX}\")) < \"${CUTOFF_DATE}\") | .tagName" \
             | while read -r TAG; do
                 echo "Deleting old release: ${TAG}"
                 gh release delete "${TAG}" --yes --cleanup-tag
