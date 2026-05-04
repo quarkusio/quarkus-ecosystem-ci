@@ -1,10 +1,10 @@
-timestamp: 2026-05-01_01-53-08
+timestamp: 2026-05-04_01-52-41
 issues:
   latestCommit: "215"
   repo: mcollovati/quarkus-hilla
 quarkus:
   version: 999-SNAPSHOT
-  sha: e4f6925c4114db3e9d3dd49e54b3abc540270736
+  sha: b86a9249ecaaed82feabbc70fb3242f32b4d9b70
 alternatives:
   2.x:
     issue: 216
