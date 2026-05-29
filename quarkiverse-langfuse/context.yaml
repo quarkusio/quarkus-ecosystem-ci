@@ -1,0 +1,7 @@
+timestamp: 2026-05-29_01-47-09
+issues:
+  repo: quarkiverse/quarkiverse
+quarkus:
+  version: 999-SNAPSHOT
+alternatives:
+  null
