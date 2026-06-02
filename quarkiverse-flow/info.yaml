@@ -2,3 +2,7 @@ url: https://github.com/quarkiverse/quarkus-flow
 issues:
   repo: quarkiverse/quarkiverse
   latestCommit: 359
+alternatives:
+  '3.33':
+    issue: 395
+    quarkusBranch: '3.33'
