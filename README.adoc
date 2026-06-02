@@ -151,3 +151,128 @@ by adding an executable bash script `.github/ci-init.sh` to your repository.
 The "trick" (more like a hack actually) is that Quarkus Platform participant's GitHub Actions are triggered when the Quarkus Ecosystem CI stars the extension repository.
 Furthermore, before starring the repository, some context information is written to this repository which is then meant to be read in the triggered Github Action.
 This way this Quarkus Github Action does not need to hold any secrets for the participants.
+
+== `info.yaml` Configuration Reference
+
+Each ecosystem member directory must contain an `info.yaml` file with the following fields:
+
+=== Required fields
+
+[cols="2,1,4"]
+|===
+| Field | Type | Description
+
+| `url`
+| String
+| GitHub repository URL of the extension (e.g. `https://github.com/quarkiverse/quarkus-amazon-services`)
+
+| `issues.repo`
+| String
+| GitHub repository (`owner/repo` format) where CI result issues are tracked. Use `quarkusio/quarkus` for platform extensions or `quarkiverse/quarkiverse` for Quarkiverse extensions.
+
+| `issues.latestCommit`
+| Integer
+| The number of the GitHub issue where CI updates will be posted. The CI job will open or close this issue depending on the outcome.
+|===
+
+=== Optional fields
+
+[cols="2,1,4"]
+|===
+| Field | Type | Description
+
+| `alternatives`
+| Object
+| A map of alternative build configurations, keyed by a version or branch identifier (e.g. `3.15`, `3.20`). Each entry defines a separate CI run against a specific Quarkus branch.
+
+| `alternatives.<name>.issue`
+| Integer
+| GitHub issue number where CI results for this alternative will be posted.
+
+| `alternatives.<name>.quarkusBranch`
+| String
+| The Quarkus branch to build against for this alternative (e.g. `3.15`, `3.20`).
+|===
+
+=== Examples
+
+Minimal configuration (required fields only):
+
+[source,yaml]
+----
+url: https://github.com/quarkiverse/quarkus-amazon-services
+issues:
+  repo: quarkiverse/quarkiverse
+  latestCommit: 56
+----
+
+Configuration with multiple alternatives:
+
+[source,yaml]
+----
+url: https://github.com/quarkusio/quarkus-platform
+issues:
+  repo: quarkusio/quarkus
+  latestCommit: 8593
+alternatives:
+  '3.15':
+    issue: 45119
+    quarkusBranch: '3.15'
+  '3.20':
+    issue: 47241
+    quarkusBranch: '3.20'
+----
+
+== `context.yaml` Configuration Reference
+
+The `context.yaml` file is **auto-generated** by the CI pipeline (via the `run-for-member` script) and committed to each member's directory before triggering the member's CI. It is then read by the member's GitHub Actions workflow (via the `setup-and-test` script) to determine what to build and where to report results.
+
+You should not need to edit this file manually.
+
+=== Fields
+
+[cols="2,1,4"]
+|===
+| Field | Type | Description
+
+| `timestamp`
+| String
+| Timestamp of when the CI was triggered, in `YYYY-MM-DD_HH-MM-SS` format.
+
+| `issues.latestCommit`
+| String
+| GitHub issue number for CI result updates (copied from `info.yaml`).
+
+| `issues.repo`
+| String
+| GitHub repository where the issue lives (copied from `info.yaml`).
+
+| `quarkus.version`
+| String
+| The Quarkus Maven version being tested against (typically `999-SNAPSHOT` for snapshot builds).
+
+| `quarkus.sha`
+| String
+| Git commit SHA of the Quarkus repository being tested.
+
+| `alternatives`
+| Object
+| Alternative build configurations, copied from `info.yaml` when present. Same structure as documented above.
+|===
+
+=== Example
+
+[source,yaml]
+----
+timestamp: 2025-07-23_15-41-05
+issues:
+  latestCommit: "8593"
+  repo: quarkusio/quarkus
+quarkus:
+  version: 999-SNAPSHOT
+  sha: c4f766a180f237d4d979b29a1cfaddde2c0f4e8b
+alternatives:
+  '3.15':
+    issue: 45119
+    quarkusBranch: '3.15'
+----
