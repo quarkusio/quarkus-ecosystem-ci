@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
+	<mirrors>
+		<mirror>
+			<id>google-maven-central-mirror</id>
+			<name>Google Maven Central Mirror</name>
+			<url>https://maven-central.storage-download.googleapis.com/maven2/</url>
+			<mirrorOf>external:*</mirrorOf>
+		</mirror>
+	</mirrors>
 	<profiles>
 		<profile>
 			<id>google-mirror</id>
