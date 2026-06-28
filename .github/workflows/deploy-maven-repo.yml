@@ -28,12 +28,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - branch: main
+          - branch: "main"
+            java-version: 21
+          - branch: "3.33"
             java-version: 17
-          - branch: 3.33
+          - branch: "3.27"
             java-version: 17
-          - branch: 3.27
+          - branch: "3.x"
             java-version: 17
+            
     env:
       MAVEN_OPTS: -Xmx6g -XX:MaxMetaspaceSize=2g
     steps:
