@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-QUARKUS_SNAPSHOT_BRANCH="${1:-main}"
+QUARKUS_SNAPSHOT_BRANCH="${1:-3.x}"
 QUARKUS_SNAPSHOT_REPO="quarkusio/quarkus-ecosystem-ci"
 PREFIX="maven-repo-${QUARKUS_SNAPSHOT_BRANCH}-"
 
