@@ -25,7 +25,7 @@ jobs:
         working-directory: ecosystem-ci
         run: |
           #get the sha or the latest main
-          QUARKUS_SHA=$(git ls-remote https://github.com/quarkusio/quarkus main | awk '{print $1;}')
+          QUARKUS_SHA=$(git ls-remote https://github.com/quarkusio/quarkus 3.x | awk '{print $1;}')
 
           ./run-for-member "${MEMBER}" "${QUARKUS_SHA}" "${ECOSYSTEM_CI_TOKEN}"
         env:
