@@ -52,9 +52,7 @@ else
   fi
 
   QUARKUS_SHA=$(git rev-parse HEAD)
-  if [[ -z "${QUARKUS_VERSION}" ]]; then
-    QUARKUS_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
-  fi
+  QUARKUS_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
 
   QUARKUS_BUILT_FROM_SOURCE="true"
 

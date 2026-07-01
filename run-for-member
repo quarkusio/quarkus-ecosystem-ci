@@ -25,7 +25,6 @@ touch context.yaml
 yq e ".timestamp = \"$(date +'%Y-%m-%d_%H-%M-%S')\"" context.yaml -i
 yq e ".issues.latestCommit = \"${LATEST_COMMIT_ISSUE_NUM}\"" context.yaml -i
 yq e ".issues.repo = \"${ISSUE_REPO}\"" context.yaml -i
-yq e ".quarkus.version = \"999-SNAPSHOT\"" context.yaml -i
 yq e ".quarkus.sha = \"${QUARKUS_SHA}\"" context.yaml -i
 
 # delete previous alternatives
