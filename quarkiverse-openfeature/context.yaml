@@ -1,0 +1,8 @@
+timestamp: 2026-07-14_01-45-44
+issues:
+  latestCommit: "410"
+  repo: quarkiverse/quarkiverse
+quarkus:
+  sha: 582ee693cff1d9a287dc55ef4a36f773bf239e2f
+alternatives:
+  null
