@@ -2,10 +2,10 @@
 <settings>
 	<mirrors>
 		<mirror>
-			<id>google-maven-central-mirror</id>
-			<name>Google Maven Central Mirror</name>
+			<id>block-central-portal-snapshots</id>
+			<name>Block Sonatype Central Portal Snapshots</name>
 			<url>https://maven-central.storage-download.googleapis.com/maven2/</url>
-			<mirrorOf>external:*</mirrorOf>
+			<mirrorOf>central-portal-snapshots</mirrorOf>
 		</mirror>
 	</mirrors>
 	<profiles>
