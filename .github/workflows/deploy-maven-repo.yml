@@ -26,10 +26,11 @@ jobs:
     name: "Deploy Maven Repo - ${{ matrix.branch }}"
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - branch: "main"
-            java-version: 17
+            java-version: 21
           - branch: "3.33"
             java-version: 17
           - branch: "3.27"
