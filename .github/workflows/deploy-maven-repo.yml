@@ -35,7 +35,7 @@ jobs:
             java-version: 17
           - branch: "3.27"
             java-version: 17
-          - branch: "3.39"
+          - branch: "3.40"
             java-version: 17
             
     env:
