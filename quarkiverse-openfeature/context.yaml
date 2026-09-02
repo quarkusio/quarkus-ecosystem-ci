@@ -1,8 +1,8 @@
-timestamp: 2026-09-01_01-40-33
+timestamp: 2026-09-02_01-32-40
 issues:
   latestCommit: "410"
   repo: quarkiverse/quarkiverse
 quarkus:
-  sha: 34b144f8368b0b72d050cae27a53e4fb74323b65
+  sha: 0c8b58295121c1b76795d6564be58023687eb98a
 alternatives:
   null
