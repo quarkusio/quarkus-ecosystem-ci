@@ -9,7 +9,7 @@ if [[ -z "${ALTERNATIVE}" ]]; then
   QUARKUS_VERSION=$(yq e '.quarkus.version' ${ECOSYSTEM_CI_REPO_FILE})
 else
   # Check if the alternative exists
-  if [[ "$(yq e '.alternatives|has(env(ALTERNATIVE))' ${ECOSYSTEM_CI_REPO_FILE})" ]] ; then
+  if [[ "$(yq e '.alternatives|has(env(ALTERNATIVE))' ${ECOSYSTEM_CI_REPO_FILE})" == "true" ]] ; then
     ISSUE_NUM=$(yq e ".alternatives.\"${ALTERNATIVE}\".issue" ${ECOSYSTEM_CI_REPO_FILE})
     QUARKUS_BRANCH=$(yq e ".alternatives.\"${ALTERNATIVE}\".quarkusBranch" ${ECOSYSTEM_CI_REPO_FILE})
   else
