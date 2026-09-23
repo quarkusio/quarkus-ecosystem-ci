@@ -27,16 +27,13 @@ yq e ".issues.latestCommit = \"${LATEST_COMMIT_ISSUE_NUM}\"" context.yaml -i
 yq e ".issues.repo = \"${ISSUE_REPO}\"" context.yaml -i
 yq e ".quarkus.sha = \"${QUARKUS_SHA}\"" context.yaml -i
 
-# delete previous alternatives
-yq e 'del(.alternatives)' context.yaml -i
-# if alternatives is set in info.yaml, then copy it to context.yaml
-alts=$(yq e '.alternatives' info.yaml)
-if [ -n "${alts}" ]; then
-  echo "alternatives:" >> context.yaml
-  list=$(yq e '.alternatives' info.yaml)
-  while IFS= read -r line; do
-    echo "  $line" >> context.yaml
-  done <<< "$alts"
+# copy the alternatives declared in info.yaml, dropping the key when there are none.
+# yq prints "null" for a missing path, so the presence check cannot rely on the
+# output being empty.
+if [[ "$(yq e 'has("alternatives")' info.yaml)" == "true" ]]; then
+  yq e -i '.alternatives = load("info.yaml").alternatives' context.yaml
+else
+  yq e -i 'del(.alternatives)' context.yaml
 fi
 
 # commit changes
