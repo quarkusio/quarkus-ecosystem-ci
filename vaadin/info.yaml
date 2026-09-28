@@ -1,4 +1,4 @@
-url: https://github.com/vaadin/quarkus
+url: https://github.com/vaadin/flow
 issues:
-  repo: vaadin/quarkus
-  latestCommit: 108
+  repo: vaadin/flow
+  latestCommit: 25991
