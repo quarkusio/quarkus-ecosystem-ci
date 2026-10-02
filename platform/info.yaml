@@ -3,6 +3,9 @@ issues:
   repo: quarkusio/quarkus
   latestCommit: 8593
 alternatives:
+  '3.40':
+    issue: 57105
+    quarkusBranch: '3.40'
   '3.33':
     issue: 53305
     quarkusBranch: '3.33'
