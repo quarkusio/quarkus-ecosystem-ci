@@ -1,6 +1,6 @@
-timestamp: 2026-11-06_21-15-16
+timestamp: 2026-11-09_21-15-53
 issues:
   latestCommit: "409"
   repo: quarkiverse/quarkiverse
 quarkus:
-  sha: 5d9273e7e17d4bcd9c91c0df330695dc02d329ef
+  sha: 4c32ab298d3cf7cebe2ad32851a667e83cbaa649
